@@ -13,7 +13,7 @@ rodikliai/
   saltiniai.py            # duomenų rinkiniai, naudojami kelių rodiklių
   realusis_du.py          # 1 rodiklis = 1 failas
   energijos_kainos.py
-  busto_ispirkamumas.py   # šablonas rodikliui, kurio duomenys dar neparuošti
+  busto_ispirkamumas.py
 sablonai/                 # HTML šablonai (Jinja)
 statika/stilius.css       # išvaizda
 duomenys/                 # duomenų failai (xlsx / csv)
@@ -60,6 +60,7 @@ Patikrinkite, kad data.gov.lt CSV stulpelių pavadinimai sutampa su dabartinio f
 | Rodiklis | Gerėja | Prastėja | Stabilu |
 |---|---|---|---|
 | Realusis DU | metinis pokytis > +0,5 % | < −0,5 % | tarp jų |
+| Būsto įperkamumas | būstas brangsta > 1 p. p. lėčiau nei auga neto DU (ketvirčiais) | > 1 p. p. greičiau | tarp jų |
 | Energijos kainos | energija brangsta > 1 p. p. lėčiau nei auga neto DU | > 1 p. p. greičiau | tarp jų |
 
 Taisyklės rodomos ir kiekvieno rodiklio puslapyje. Jas verta suderinti su darbo grupe.
