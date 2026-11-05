@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% set kelias = "" %}
+{% block turinys %}
+<section class="ivadas">
+  <h1>Ar Lietuvai sekasi geriau?</h1>
+  <p>Šešios politikos sritys, kiekvienoje – keli reguliariai atnaujinami rodikliai.
+     Kiekvienas rodiklis vertinamas pagal iš anksto nustatytą taisyklę: <b>gerėja</b>, <b>stabilu</b> arba <b>prastėja</b>.
+     Paspaudę rodiklį pamatysite grafikus, apibrėžimą ir šaltinius.</p>
+  <ul class="legenda" aria-label="Būsenų reikšmės">
+    {% for k in ["gereja", "stabilu", "prasteja", "nera"] %}
+    <li><span class="zyme zyme-{{ k }}"><span aria-hidden="true">{{ busenos[k].ikona }}</span> {{ busenos[k].zodis }}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% for s in sritys %}
+<section class="sritis{% if not s.rodikliai %} sritis-rengiama{% endif %}" id="sritis-{{ s.nr }}">
+  <div class="sritis-galva">
+    <div>
+      <div class="sritis-nr">{{ s.nr }} sritis</div>
+      <h2>{{ s.pavadinimas }}</h2>
+      <p class="klausimas">{{ s.klausimas }}</p>
+    </div>
+    {% if s.rodikliai %}
+    <p class="suvestine">
+      {% for k in ["gereja", "stabilu", "prasteja"] if s.suvestine[k] %}
+        <span class="zyme zyme-{{ k }}"><span aria-hidden="true">{{ busenos[k].ikona }}</span> {{ busenos[k].zodis }}: {{ s.suvestine[k] }}</span>
+      {% endfor %}
+    </p>
+    {% endif %}
+  </div>
+
+  {% if s.rodikliai %}
+  <div class="korteles">
+    {% for r in s.rodikliai %}
+    <a class="kortele kortele-{{ r.busena }}" href="rodikliai/{{ r.id }}.html">
+      <div class="kortele-virsus">
+        <h3>{{ r.pavadinimas }}</h3>
+        <span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span>
+      </div>
+      {% if r.reiksme is not none %}
+      <div class="kortele-skaicius">{{ r.reiksme|sk }}<span class="vnt">{{ r.vienetai }}</span></div>
+      <div class="kortele-aprasas">{{ r.trumpas_aprasas }} · {{ r.laikotarpis|laikotarpis }}</div>
+      {{ r.spark|safe }}
+      {% else %}
+      <div class="kortele-tuscia">{{ r.trumpas_aprasas|capitalize }}</div>
+      {% endif %}
+      <span class="kortele-nuoroda">Plačiau →</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="rengiama">Rodikliai rengiami.</p>
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}

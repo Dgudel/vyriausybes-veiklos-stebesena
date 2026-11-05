@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Vyriausybės veiklos stebėsena{% endblock %}</title>
+<meta name="description" content="Vyriausybės veiklos stebėsenos sistema: rodikliai, jų kitimas ir vertinimas.">
+<link rel="stylesheet" href="{{ kelias }}statika/stilius.css">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="virsus">
+  <div class="plotis">
+    <a class="logo" href="{{ kelias }}index.html">Vyriausybės veiklos stebėsena</a>
+    <span class="prototipas">Prototipas</span>
+  </div>
+</header>
+<main class="plotis">
+{% block turinys %}{% endblock %}
+</main>
+<footer class="apacia">
+  <div class="plotis">
+    Duomenys: Valstybės duomenų agentūra (Oficialiosios statistikos portalas, data.gov.lt).
+    Puslapis atnaujintas {{ atnaujinta }}.
+  </div>
+</footer>
+</body>
+</html>

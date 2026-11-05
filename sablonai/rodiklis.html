@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% set kelias = "../" %}
+{% block title %}{{ r.pavadinimas }} · Vyriausybės veiklos stebėsena{% endblock %}
+{% block head %}
+{% if r.grafiku_html %}<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@{{ plotlyjs_versija }}/plotly.min.js" charset="utf-8"></script>{% endif %}
+{% endblock %}
+{% block turinys %}
+<nav class="kelias-nav"><a href="../index.html#sritis-{{ sritis.nr }}">← {{ sritis.nr }}. {{ sritis.pavadinimas }}</a></nav>
+
+<section class="rodiklio-galva">
+  <div>
+    <h1>{{ r.pavadinimas }}</h1>
+    {% if r.reiksme is not none %}
+    <div class="didelis">{{ r.reiksme|sk }}<span class="vnt">{{ r.vienetai }}</span></div>
+    <div class="kortele-aprasas">{{ r.trumpas_aprasas }} · {{ r.laikotarpis|laikotarpis }}</div>
+    {% endif %}
+  </div>
+  <div class="vertinimas vertinimas-{{ r.busena }}">
+    <span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span>
+    {% if r.vertinimo_paaiskinimas %}<p>{{ r.vertinimo_paaiskinimas }}</p>{% endif %}
+    <p class="taisykle"><b>Kaip vertinama.</b> {{ r.vertinimo_taisykle }}</p>
+  </div>
+</section>
+
+{% if r.papildomai %}
+<section class="papildomai">
+  {% for skaicius, tekstas in r.papildomai %}
+  <div class="papildomas"><b>{{ skaicius }}</b> <span>{{ tekstas }}</span></div>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% for g in r.grafiku_html %}
+<figure class="grafikas">{{ g|safe }}</figure>
+{% endfor %}
+
+<section class="aprasas">
+  <div>
+    <h2>Apibrėžimas</h2>
+    <p>{{ r.apibrezimas }}</p>
+    {% if r.pastabos %}
+    <h2>Pastabos</h2>
+    <ul>{% for p in r.pastabos %}<li>{{ p }}</li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+  <div>
+    <h2>Šaltiniai</h2>
+    <ul>{% for pav, url in r.saltiniai %}<li><a href="{{ url }}" target="_blank" rel="noopener">{{ pav }}</a></li>{% endfor %}</ul>
+    {% if r.lentele is not none %}
+    <h2>Duomenys</h2>
+    <p><a class="mygtukas" href="../duomenys/{{ r.id }}.csv" download>Atsisiųsti CSV</a></p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
