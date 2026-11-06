@@ -19,7 +19,9 @@ rodikliai/
   sveikatos_rezultatai.py
   svietimo_pasiekimai.py  # PUPP (NŠA) ir PISA (Eurostat)
   issilavinimas.py        # anksti mokslus palikę, aukštasis išsilavinimas (Eurostat)
+  brandos_egzaminai.py    # VBE (NŠA)
 irankiai/pupp_rezultatai.py  # NŠA PUPP PDF → duomenys/pupp_salies_eilutes.csv (paleisti kartą per metus)
+irankiai/vbe_rezultatai.py   # NŠA VBE PDF + Excel → duomenys/vbe_salies_eilutes.csv, vbe_mokyklu_vidurkiai.csv
 sablonai/                 # HTML šablonai (Jinja)
 statika/stilius.css       # išvaizda
 duomenys/                 # duomenų failai (xlsx / csv)
@@ -64,6 +66,9 @@ GitHub Actions svetainę perkuria **kasdien** (5:00 UTC) ir prieš tai atsisiun�
   `sdg_04_10`, `sdg_04_20`, `sdg_04_40`.
 - **NŠA PUPP rezultatai** skelbiami tik PDF, todėl atnaujinami rankiniu būdu kartą per metus (rugpjūtį–rugsėjį):
   paleiskite `python irankiai/pupp_rezultatai.py` ir nukopijuokite sukurtą `pupp_salies_eilutes.csv` į `duomenys/`.
+- **NŠA VBE rezultatai**: 2013–2024 m. – PDF (`irankiai/vbe_rezultatai.py`), nuo 2025 m. – NŠA Excel „VBE vidurkiai
+  pagal mokyklas“. Naujus Excel failus padėkite į VBE aplanką, paleiskite skriptą ir nukopijuokite
+  `vbe_mokyklu_vidurkiai.csv` į `duomenys/`.
 
 Jei šaltinis nepasiekiamas, naudojami failai iš `duomenys/`. Savo kompiuteryje su naujausiais duomenimis:
 
@@ -81,6 +86,7 @@ ATNAUJINTI=1 python generuoti.py
 | Negavo gydymo dėl laukimo eilių | dalis per metus sumažėja > 0,3 p. p. | padidėja > 0,3 p. p. | tarp jų |
 | Išvengiamas mirtingumas dėl gydymo | rodiklis per metus sumažėja > 2 % | padidėja > 2 % | tarp jų |
 | Matematikos pasiekimai (PUPP) | nepasiekusių patenkinamo lygio dalis sumažėja > 2 p. p. | padidėja > 2 p. p. | tarp jų |
+| Matematikos VBE išlaikymas | išlaikiusiųjų dalis padidėja > 2 p. p. | sumažėja > 2 p. p. | tarp jų |
 | Anksti mokslus palikę jaunuoliai | dalis sumažėja > 0,5 p. p. | padidėja > 0,5 p. p. | tarp jų |
 
 Taisyklės rodomos ir kiekvieno rodiklio puslapyje. Jas verta suderinti su darbo grupe.
