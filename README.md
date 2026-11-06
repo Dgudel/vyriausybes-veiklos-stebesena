@@ -68,7 +68,7 @@ atsisiunčiamos automatiškai per paketą `eurostat`; jei Eurostat nepasiekiamas
 | Realusis DU | metinis pokytis > +0,5 % | < −0,5 % | tarp jų |
 | Būsto įperkamumas | būstas brangsta > 1 p. p. lėčiau nei auga neto DU (ketvirčiais) | > 1 p. p. greičiau | tarp jų |
 | Energijos kainos | energija brangsta > 1 p. p. lėčiau nei auga neto DU | > 1 p. p. greičiau | tarp jų |
-| Laukimo eilės sveikatos priežiūroje | dalis per metus sumažėja > 0,3 p. p. | padidėja > 0,3 p. p. | tarp jų |
+| Negavo gydymo dėl laukimo eilių | dalis per metus sumažėja > 0,3 p. p. | padidėja > 0,3 p. p. | tarp jų |
 | Išvengiamas mirtingumas dėl gydymo | rodiklis per metus sumažėja > 2 % | padidėja > 2 % | tarp jų |
 
 Taisyklės rodomos ir kiekvieno rodiklio puslapyje. Jas verta suderinti su darbo grupe.

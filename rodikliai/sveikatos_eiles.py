@@ -1,4 +1,4 @@
-"""2.1 Sveikatos priežiūros prieinamumas: nepatenkinti poreikiai dėl laukimo eilių."""
+"""2.1 Negavo gydymo dėl laukimo eilių (Eurostat apklausos rodiklis)."""
 import plotly.graph_objects as go
 
 from .bendra import SERIJOS, TEKSTAS_ANTR, Rodiklis, ivertink, linijos, sk, stilius
@@ -61,8 +61,8 @@ def rodiklis() -> Rodiklis:
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
     return Rodiklis(
         id="sveikatos-prieziuros-eiles",
-        pavadinimas="Laukimo eilės sveikatos priežiūroje",
-        trumpas_aprasas="negavo pagalbos dėl eilių",
+        pavadinimas="Negavo gydymo dėl laukimo eilių",
+        trumpas_aprasas="16 m. ir vyresnių gyventojų, apklausos duomenys",
         reiksme=pask, vienetai="%", laikotarpis=str(metai), busena=busena,
         zenklas=False, spark_nuo_nulio=True,
         vertinimo_taisykle=(f"Gerėja, kai dalis per metus sumažėja daugiau nei {sk(SLENKSTIS, False)} proc. punkto; "
