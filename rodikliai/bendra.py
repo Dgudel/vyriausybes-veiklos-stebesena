@@ -48,16 +48,53 @@ class Rodiklis:
 
 
 # ---------------- Duomenys ----------------
-def skaityk(failas: str, datagov_modelis: str | None = None) -> pd.DataFrame:
-    """Skaito duomenis iš duomenys/ aplanko. Jei nurodytas data.gov.lt modelis ir aplinkoje
-    ATNAUJINTI=1 (taip daro GitHub Actions), prieš tai atsisiunčia naujausią versiją."""
+DATAPORTAL_API = "https://api.dataportal.gov.lt/namespaces/188600177/tables"
+
+
+def atsisiusk_dataportal(lentele: str, puslapis: int = 1000) -> pd.DataFrame:
+    """Atsisiunčia visą lentelę iš Lietuvos duomenų portalo API.
+
+    API puslapiuoja pagal puslapio numerį (atsakyme yra current_page / total_pages), todėl pirmiausia
+    sužinome eilučių skaičių ir bandome gauti viską viena užklausa; jei API riboja dydį – einame
+    per puslapius. Dublikatai pašalinami pagal row_id ir patikrinama, ar gautos visos eilutės."""
+    import requests
+    url = f"{DATAPORTAL_API}/{lentele}/query"
+
+    def uzklausa(**kuno):
+        r = requests.post(url, json=kuno, timeout=120)
+        r.raise_for_status()
+        return r.json()
+
+    viso = uzklausa(limit=1, offset=0)["total"]
+    d = uzklausa(limit=viso, offset=0)
+    eilutes = d["data"]
+    if len(eilutes) < viso:                      # API ribojo puslapio dydį – einame per puslapius
+        eilutes = []
+        dydis = len(d["data"]) or puslapis
+        for nr in range(1, -(-viso // dydis) + 1):
+            eilutes += uzklausa(limit=dydis, offset=(nr - 1) * dydis, page=nr)["data"]
+
+    df = pd.DataFrame(eilutes)
+    if "row_id" in df.columns:
+        df = df.drop_duplicates(subset="row_id")
+    if len(df) != viso:
+        raise RuntimeError(f"{lentele}: gauta {len(df)} skirtingų eilučių iš {viso}")
+    return df
+
+
+def skaityk(failas: str, api_lentele: str | None = None) -> pd.DataFrame:
+    """Skaito duomenis iš duomenys/ aplanko. Jei nurodyta duomenų portalo lentelė ir aplinkoje
+    ATNAUJINTI=1 (taip daro GitHub Actions), pirmiausia bando atsisiųsti naujausią versiją per API.
+    Jei nepavyksta – naudojamas esamas failas, todėl švieslentė niekada nelieka tuščia."""
     kelias = DUOMENYS / failas
-    if datagov_modelis and os.environ.get("ATNAUJINTI") == "1":
-        import urllib.request
-        url = f"https://get.data.gov.lt/{datagov_modelis.strip('/')}/:format/csv"
-        kelias = kelias.with_suffix(".csv")
-        print(f"  ↓ {url}")
-        urllib.request.urlretrieve(url, kelias)
+    if api_lentele and os.environ.get("ATNAUJINTI") == "1":
+        try:
+            df = atsisiusk_dataportal(api_lentele)
+            df.to_csv(kelias.with_name(f"{api_lentele}.csv"), index=False)
+            print(f"  ↓ Duomenų portalas {api_lentele}: {len(df)} eilučių")
+            return df
+        except Exception as e:
+            print(f"  ⚠ {api_lentele} neatsisiųsta ({e}); naudojamas {failas}")
     if kelias.suffix in (".xlsx", ".xls"):
         return pd.read_excel(kelias)
     return pd.read_csv(kelias)

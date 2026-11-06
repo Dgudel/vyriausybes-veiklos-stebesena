@@ -12,10 +12,10 @@ SEKTORIAI = {
     "Viešasis sektorius": "Viešasis sektorius",
 }
 
-# data.gov.lt modelių keliai automatiniam atnaujinimui. Kai rasite tikslų kelią portale
-# (pvz. su duomenų agentu), įrašykite jį vietoj None – GitHub Actions ims naujausius duomenis.
-DU_MODELIS = None      # pvz. "datasets/gov/lsd/statistika/darbo_uzmokestis/S10R027..."
-KAINU_MODELIS = None
+# Lietuvos duomenų portalo (dataportal.gov.lt) API lentelės automatiniam atnaujinimui.
+# Pavadinimą rasite rinkinio puslapyje: Eksportuoti → API endpoint → .../tables/<PAVADINIMAS>/query
+DU_MODELIS = "S10R027_M3060315_4_lt"
+KAINU_MODELIS = "S7R329_M2020214_1_lt"
 
 
 @cache
@@ -54,7 +54,7 @@ def laikotarpis_is_datos(d: pd.Timestamp) -> str:
 
 
 # ---------------- Būsto kainos ----------------
-BUSTO_MODELIS = None
+BUSTO_MODELIS = "S7R334_M2021001_3_lt"
 
 TERITORIJOS = {"Lietuvos Respublika": "Lietuva", "Vilniaus m. sav.": "Vilniaus m. sav.",
                "Kita šalies teritorija": "Kita šalies teritorija"}

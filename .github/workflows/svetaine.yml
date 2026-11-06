@@ -1,12 +1,12 @@
 # Sugeneruoja švieslentę ir paskelbia ją GitHub Pages.
-# Paleidžiama: kiekvieną kartą įkėlus pakeitimus į main šaką, kas mėnesį 25 d. ir rankiniu būdu (Actions → Run workflow).
+# Paleidžiama: kiekvieną kartą įkėlus pakeitimus į main šaką, kasdien 5:00 UTC ir rankiniu būdu (Actions → Run workflow).
 name: Švieslentės atnaujinimas
 
 on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 6 25 * *"
+    - cron: "0 5 * * *"     # kasdien (7–8 val. Lietuvos laiku)
   workflow_dispatch:
 
 permissions:
@@ -30,7 +30,7 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Sugeneruoti svetainę
         env:
-          ATNAUJINTI: "1"    # atsisiųsti naujausius duomenis iš data.gov.lt, kur nurodyti modeliai
+          ATNAUJINTI: "1"    # atsisiųsti naujausius duomenis iš duomenų portalo ir Eurostat
         run: python generuoti.py
       - uses: actions/upload-pages-artifact@v3
         with:

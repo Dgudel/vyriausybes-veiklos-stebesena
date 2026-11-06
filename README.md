@@ -39,7 +39,7 @@ python -m http.server -d _site 8000     # atidarykite http://localhost:8000
 4. **Actions** skiltyje pamatysite „Švieslentės atnaujinimas“ – po 1–2 min. svetainė bus adresu
    `https://<paskyra>.github.io/<repozitorija>/`.
 
-Svetainė perkuriama kiekvieną kartą įkėlus pakeitimus, kas mėnesį 25 d. ir rankiniu būdu (Actions → Run workflow).
+Svetainė perkuriama kiekvieną kartą įkėlus pakeitimus, kasdien ir rankiniu būdu (Actions → Run workflow).
 
 ## Kaip pridėti naują rodiklį
 
@@ -53,13 +53,17 @@ Kiekvienas rodiklis – atskiras failas, todėl kolegos gali dirbti lygiagrečia
 
 ## Automatinis duomenų atnaujinimas
 
-`rodikliai/saltiniai.py` įrašykite data.gov.lt modelio kelią (pvz. `DU_MODELIS = "datasets/gov/lsd/..."`).
-Tada GitHub Actions prieš generuodamas atsisiųs naujausius duomenis iš `get.data.gov.lt`.
-Kol kelias nenurodytas, naudojamas failas iš `duomenys/` – jį atnaujinkite rankiniu būdu.
-Patikrinkite, kad data.gov.lt CSV stulpelių pavadinimai sutampa su dabartinio failo stulpeliais.
+GitHub Actions svetainę perkuria **kasdien** (5:00 UTC) ir prieš tai atsisiunčia naujausius duomenis:
 
-Eurostat lentelės (`hlth_silc_08`, `hlth_cd_apr`, `demo_mlexpec`, `hlth_silc_01`) GitHub Actions
-atsisiunčiamos automatiškai per paketą `eurostat`; jei Eurostat nepasiekiamas, naudojami failai iš `duomenys/`.
+- **Lietuvos duomenų portalas** (`api.dataportal.gov.lt`): S10R027, S7R329, S7R334. Lentelių pavadinimai –
+  `rodikliai/saltiniai.py`. Naujai lentelei pavadinimą rasite rinkinio puslapyje: Eksportuoti → API endpoint.
+- **Eurostat** (paketas `eurostat`): `hlth_silc_08`, `hlth_cd_apr`, `demo_mlexpec`, `hlth_silc_01`.
+
+Jei šaltinis nepasiekiamas, naudojami failai iš `duomenys/`. Savo kompiuteryje su naujausiais duomenimis:
+
+```bash
+ATNAUJINTI=1 python generuoti.py
+```
 
 ## Vertinimo taisyklės
 
