@@ -11,7 +11,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from rodikliai import busto_ispirkamumas, energijos_kainos, realusis_du
+from rodikliai import (busto_ispirkamumas, energijos_kainos, realusis_du, sveikatos_eiles,
+                       sveikatos_rezultatai)
 from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis
 
 SAKNIS = Path(__file__).resolve().parent
@@ -23,7 +24,8 @@ SRITYS = [
      "klausimas": "Ar žmonių materialinė gerovė gerėja?",
      "rodikliai": [realusis_du, busto_ispirkamumas, energijos_kainos]},
     {"nr": 2, "pavadinimas": "Viešosios paslaugos",
-     "klausimas": "Ar piliečiai gauna geresnes viešąsias paslaugas?", "rodikliai": []},
+     "klausimas": "Ar piliečiai gauna geresnes viešąsias paslaugas?",
+     "rodikliai": [sveikatos_eiles, sveikatos_rezultatai]},
     {"nr": 3, "pavadinimas": "Ekonomika ir užimtumas",
      "klausimas": "Ar ekonomika kuria gerovę ir darbo vietas?", "rodikliai": []},
     {"nr": 4, "pavadinimas": "Infrastruktūra ir aplinka",
@@ -63,13 +65,13 @@ def main():
         for modulis in sritis["rodikliai"]:
             print(f"• {modulis.__name__}")
             r = modulis.rodiklis()
-            r.spark = sparkline_svg(r.sparkline) if r.sparkline is not None else ""
+            r.spark = sparkline_svg(r.sparkline, nuo_nulio=r.spark_nuo_nulio) if r.sparkline is not None else ""
             r.grafiku_html = [f.to_html(full_html=False, include_plotlyjs=False,
                                         config={"displaylogo": False, "responsive": True,
                                                 "toImageButtonOptions": {"format": "png", "scale": 2}})
                               for f in r.grafikai]
             if r.lentele is not None:
-                r.lentele.to_csv(ISVESTIS / "duomenys" / f"{r.id}.csv", index=False, encoding="utf-8-sig")
+                r.lentele.round(2).to_csv(ISVESTIS / "duomenys" / f"{r.id}.csv", index=False, encoding="utf-8-sig")
             rodikliai.append(r)
         suvestine = {k: sum(r.busena == k for r in rodikliai) for k in BUSENOS}
         sritys.append({**sritis, "rodikliai": rodikliai, "suvestine": suvestine})

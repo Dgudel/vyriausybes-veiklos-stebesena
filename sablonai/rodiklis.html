@@ -11,7 +11,7 @@
   <div>
     <h1>{{ r.pavadinimas }}</h1>
     {% if r.reiksme is not none %}
-    <div class="didelis">{{ r.reiksme|sk }}<span class="vnt">{{ r.vienetai }}</span></div>
+    <div class="didelis">{{ r.reiksme|sk(r.zenklas, r.dec) }}<span class="vnt">{{ r.vienetai }}</span></div>
     <div class="kortele-aprasas">{{ r.trumpas_aprasas }} · {{ r.laikotarpis|laikotarpis }}</div>
     {% endif %}
   </div>

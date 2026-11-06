@@ -39,7 +39,7 @@
         <span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span>
       </div>
       {% if r.reiksme is not none %}
-      <div class="kortele-skaicius">{{ r.reiksme|sk }}<span class="vnt">{{ r.vienetai }}</span></div>
+      <div class="kortele-skaicius">{{ r.reiksme|sk(r.zenklas, r.dec) }}<span class="vnt">{{ r.vienetai }}</span></div>
       <div class="kortele-aprasas">{{ r.trumpas_aprasas }} · {{ r.laikotarpis|laikotarpis }}</div>
       {{ r.spark|safe }}
       {% else %}

@@ -42,6 +42,9 @@ class Rodiklis:
     saltiniai: list[tuple[str, str]] = field(default_factory=list)   # (pavadinimas, nuoroda)
     papildomai: list[tuple[str, str]] = field(default_factory=list)  # (skaičius, paaiškinimas)
     lentele: pd.DataFrame | None = None  # atsisiunčiami duomenys
+    zenklas: bool = True                 # rodyti +/− (pokyčiams); False – lygio reikšmėms
+    dec: int = 1                         # skaitmenų po kablelio
+    spark_nuo_nulio: bool = True         # ar mažame grafike rodyti nulį (pokyčiams – taip)
 
 
 # ---------------- Duomenys ----------------
@@ -108,8 +111,10 @@ def ivertink(reiksme: float, gera_kryptis: str, slenkstis: float) -> str:
 
 
 # ---------------- Grafikai ----------------
-def stilius(fig: go.Figure, pavadinimas: str, paantraste: str, saltinis: str, aukstis: int = 440):
-    fig.add_hline(y=0, line=dict(color=TEKSTAS_ANTR, width=1))
+def stilius(fig: go.Figure, pavadinimas: str, paantraste: str, saltinis: str, aukstis: int = 440,
+            vnt: str = " %", nulio_linija: bool = True, metiniai: bool = False):
+    if nulio_linija:
+        fig.add_hline(y=0, line=dict(color=TEKSTAS_ANTR, width=1))
     fig.add_annotation(text=saltinis, xref="paper", yref="paper", x=0, y=-0.25, showarrow=False,
                        xanchor="left", font=dict(size=11, color=TEKSTAS_ANTR))
     fig.update_layout(
@@ -123,19 +128,25 @@ def stilius(fig: go.Figure, pavadinimas: str, paantraste: str, saltinis: str, au
         legend=dict(orientation="h", y=1.0, x=0, yanchor="bottom", font=dict(size=12)),
         separators=", ",
     )
-    fig.update_xaxes(showgrid=False, ticklabelstandoff=10, tickformat="%Y-%m")
-    fig.update_yaxes(gridcolor=TINKLELIS, zeroline=False, ticksuffix=" %", ticklabelstandoff=8)
+    fig.update_xaxes(showgrid=False, ticklabelstandoff=10, tickformat="%Y" if metiniai else "%Y-%m")
+    fig.update_yaxes(gridcolor=TINKLELIS, zeroline=False, ticksuffix=vnt, ticklabelstandoff=8)
+    if metiniai:
+        fig.update_layout(hovermode="x unified", xaxis_hoverformat="%Y")
     return fig
 
 
-def linijos(fig: go.Figure, serijos: list[tuple[str, pd.Series, str]]):
+def linijos(fig: go.Figure, serijos: list[tuple[str, pd.Series, str]],
+            vnt: str = " %", zenklas: bool = True, dec: int = 1, zymekliai: bool = False):
     """serijos: [(pavadinimas, Series su datų indeksu, spalva)]. Prideda linijas ir galines etiketes."""
     galai = []
     for vardas, s, spalva in serijos:
         s = s.dropna()
-        fig.add_trace(go.Scatter(x=s.index, y=s.values, name=vardas, mode="lines",
+        fmt = f"{'+' if zenklas else ''}.{dec}f"
+        fig.add_trace(go.Scatter(x=s.index, y=s.values, name=vardas,
+                                 mode="lines+markers" if zymekliai else "lines",
+                                 marker=dict(size=8, line=dict(color=FONAS, width=2)),
                                  line=dict(color=spalva, width=2),
-                                 hovertemplate=f"{vardas}: %{{y:+.1f}} %<extra></extra>"))
+                                 hovertemplate=f"{vardas}: %{{y:{fmt}}}{vnt}<extra></extra>"))
         galai.append((s.index[-1], s.iloc[-1]))
     visos = pd.concat([s for _, s, _ in serijos])
     tarpas = 0.07 * ((visos.max() - visos.min()) or 1)
@@ -145,23 +156,25 @@ def linijos(fig: go.Figure, serijos: list[tuple[str, pd.Series, str]]):
         y = galai[i][1] if ankst is None else max(galai[i][1], ankst + tarpas)
         poz[i] = ankst = y
     for i, (x, y) in enumerate(galai):
-        fig.add_annotation(x=x, y=poz[i], text=f"<b>{sk(y)} %</b>", showarrow=False,
+        fig.add_annotation(x=x, y=poz[i], text=f"<b>{sk(y, zenklas, dec)}{vnt}</b>", showarrow=False,
                            xanchor="left", xshift=8, font=dict(color=TEKSTAS, size=12))
     return fig
 
 
-def sparkline_svg(s: pd.Series, plotis: int = 140, aukstis: int = 40) -> str:
+def sparkline_svg(s: pd.Series, plotis: int = 140, aukstis: int = 40, nuo_nulio: bool = True) -> str:
     """Mažas tendencijos grafikas kortelei (SVG, be JavaScript)."""
     s = s.dropna()
     if len(s) < 2:
         return ""
-    y0, y1 = min(s.min(), 0), max(s.max(), 0)
+    y0, y1 = (min(s.min(), 0), max(s.max(), 0)) if nuo_nulio else (s.min(), s.max())
     rng = (y1 - y0) or 1
     xs = [i / (len(s) - 1) * (plotis - 8) + 4 for i in range(len(s))]
     ys = [aukstis - 4 - (v - y0) / rng * (aukstis - 8) for v in s.values]
     tasku = " ".join(f"{x:.1f},{y:.1f}" for x, y in zip(xs, ys))
     nulis = aukstis - 4 - (0 - y0) / rng * (aukstis - 8)
+    linija = (f'<line x1="0" x2="{plotis}" y1="{nulis:.1f}" y2="{nulis:.1f}" class="spark-nulis"/>'
+              if nuo_nulio else "")
     return (f'<svg class="spark" viewBox="0 0 {plotis} {aukstis}" width="{plotis}" height="{aukstis}" aria-hidden="true">'
-            f'<line x1="0" x2="{plotis}" y1="{nulis:.1f}" y2="{nulis:.1f}" class="spark-nulis"/>'
+            f'{linija}'
             f'<polyline points="{tasku}" class="spark-linija"/>'
             f'<circle cx="{xs[-1]:.1f}" cy="{ys[-1]:.1f}" r="3" class="spark-taskas"/></svg>')
