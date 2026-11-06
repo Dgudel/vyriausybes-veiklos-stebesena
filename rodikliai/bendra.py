@@ -173,7 +173,8 @@ def stilius(fig: go.Figure, pavadinimas: str, paantraste: str, saltinis: str, au
 
 
 def linijos(fig: go.Figure, serijos: list[tuple[str, pd.Series, str]],
-            vnt: str = " %", zenklas: bool = True, dec: int = 1, zymekliai: bool = False):
+            vnt: str = " %", zenklas: bool = True, dec: int = 1, zymekliai: bool = False,
+            asis: tuple[float, float] | None = None, nuo_nulio: bool = True):
     """serijos: [(pavadinimas, Series su datų indeksu, spalva)]. Prideda linijas ir galines etiketes."""
     galai = []
     for vardas, s, spalva in serijos:
@@ -185,8 +186,15 @@ def linijos(fig: go.Figure, serijos: list[tuple[str, pd.Series, str]],
                                  line=dict(color=spalva, width=2),
                                  hovertemplate=f"{vardas}: %{{y:{fmt}}}{vnt}<extra></extra>"))
         galai.append((s.index[-1], s.iloc[-1]))
+    # Mažiausias tarpas tarp galinių etikečių ≈ 16 px: perskaičiuojame į ašies vienetus
     visos = pd.concat([s for _, s, _ in serijos])
-    tarpas = 0.07 * ((visos.max() - visos.min()) or 1)
+    if asis:
+        apimtis = asis[1] - asis[0]
+    elif nuo_nulio:
+        apimtis = max(visos.max(), 0) - min(visos.min(), 0)
+    else:
+        apimtis = visos.max() - visos.min()
+    tarpas = (apimtis or 1) * 16 / 230
     tvarka = sorted(range(len(galai)), key=lambda i: galai[i][1])
     poz, ankst = {}, None
     for i in tvarka:

@@ -34,7 +34,7 @@ def rodiklis() -> Rodiklis:
     f2 = go.Figure()
     nuo = gt_lt.index >= "2000-01-01"
     linijos(f2, [("Lietuva", gt_lt[nuo], SERIJOS[0]), ("ES-27", gt_es[gt_es.index >= "2000-01-01"], SERIJOS[1])],
-            vnt=" m.", zenklas=False, dec=1)
+            vnt=" m.", zenklas=False, dec=1, nuo_nulio=False)
     stilius(f2, "Vidutinė tikėtina gyvenimo trukmė gimus", "Metai", "Šaltinis: Eurostat, demo_mlexpec",
             vnt="", nulio_linija=False, metiniai=True)
 

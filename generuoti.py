@@ -11,8 +11,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from rodikliai import (busto_ispirkamumas, energijos_kainos, realusis_du, sveikatos_eiles,
-                       sveikatos_rezultatai)
+from rodikliai import (busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
+                       sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
 from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis
 
 SAKNIS = Path(__file__).resolve().parent
@@ -25,7 +25,7 @@ SRITYS = [
      "rodikliai": [realusis_du, busto_ispirkamumas, energijos_kainos]},
     {"nr": 2, "pavadinimas": "Viešosios paslaugos",
      "klausimas": "Ar piliečiai gauna geresnes viešąsias paslaugas?",
-     "rodikliai": [sveikatos_eiles, sveikatos_rezultatai]},
+     "rodikliai": [sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai, issilavinimas]},
     {"nr": 3, "pavadinimas": "Ekonomika ir užimtumas",
      "klausimas": "Ar ekonomika kuria gerovę ir darbo vietas?", "rodikliai": []},
     {"nr": 4, "pavadinimas": "Infrastruktūra ir aplinka",
