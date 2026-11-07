@@ -1,0 +1,6 @@
+pandas>=2.0
+openpyxl>=3.1
+plotly>=5.20
+jinja2>=3.1
+eurostat>=1.1
+requests>=2.28
