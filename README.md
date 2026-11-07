@@ -21,6 +21,8 @@ rodikliai/
   issilavinimas.py        # anksti mokslus palikę, aukštasis išsilavinimas (Eurostat)
   brandos_egzaminai.py    # VBE (NŠA)
   bvp.py, nedarbas.py, nasumas.py, infliacija.py, skola.py   # 3 sritis (Eurostat; infliacija – ir ECB)
+  zuvusieji_keliuose.py, sesd_emisijos.py, atlieku_perdirbimas.py   # 4 sritis (Eurostat)
+  gyventojai.py                                                     # 6 sritis (Eurostat demo_gind)
 irankiai/pupp_rezultatai.py  # NŠA PUPP PDF → duomenys/pupp_salies_eilutes.csv (paleisti kartą per metus)
 irankiai/vbe_rezultatai.py   # NŠA VBE PDF + Excel → duomenys/vbe_salies_eilutes.csv, vbe_mokyklu_vidurkiai.csv
 sablonai/                 # HTML šablonai (Jinja)
@@ -96,6 +98,10 @@ ATNAUJINTI=1 python generuoti.py
 | Darbo našumas | realus pokytis > +0,5 % | < −0,5 % | tarp jų |
 | Infliacija | priartėja prie 2 % tikslo > 0,5 p. p. (palyginti su prieš metus) | nutolsta > 0,5 p. p. | tarp jų |
 | Valdžios skola | santykis su BVP per metus sumažėja > 1 p. p. | padidėja > 1 p. p. | tarp jų |
+| Žuvusieji keliuose | 100 tūkst. gyv. per metus sumažėja > 0,3 | padidėja > 0,3 | tarp jų |
+| ŠESD išmetimai | per metus sumažėja > 1 % | padidėja > 1 % | tarp jų |
+| Atliekų perdirbimas | dalis padidėja > 1 p. p. | sumažėja > 1 p. p. | tarp jų |
+| Gyventojų skaičiaus kaita | kaita > +1 ‰ (vertinamas lygis) | kaita < −1 ‰ | tarp jų |
 | Anksti mokslus palikę jaunuoliai | dalis sumažėja > 0,5 p. p. | padidėja > 0,5 p. p. | tarp jų |
 
 Taisyklės rodomos ir kiekvieno rodiklio puslapyje. Jas verta suderinti su darbo grupe.

@@ -14,12 +14,41 @@ from .bendra import DUOMENYS
 SALYS = ["LT", "EU27_2020"]
 
 
+def tsv_i_lentele(tekstas: str) -> pd.DataFrame:
+    """Eurostat TSV (pirmas stulpelis „freq,unit,...,geo\\TIME_PERIOD“, reikšmės su žymomis „8.4 e“, „:“)
+    → platus formatas: dimensijų stulpeliai + laikotarpių stulpeliai (skaičiai)."""
+    import io
+    d = pd.read_csv(io.StringIO(tekstas), sep="\t", dtype=str)
+    pirmas = d.columns[0]
+    dims = d[pirmas].str.split(",", expand=True)
+    dims.columns = pirmas.split("\\")[0].split(",")
+    vert = d.drop(columns=pirmas)
+    vert.columns = [c.strip() for c in vert.columns]
+    vert = vert.apply(lambda s: pd.to_numeric(
+        s.str.strip().str.replace(r"[^0-9.\-]", "", regex=True).replace("", None), errors="coerce"))
+    return pd.concat([dims, vert], axis=1)
+
+
+def _atsisiusk_tsv(kodas: str) -> pd.DataFrame:
+    """Tiesioginis Eurostat API (be paketo `eurostat`) – veikia ir tada, kai paketas nesusitvarko su lentele."""
+    import requests
+    url = f"https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/{kodas}?format=TSV&compressed=false"
+    r = requests.get(url, timeout=300)
+    r.raise_for_status()
+    return tsv_i_lentele(r.text)
+
+
 def _atsisiusk(kodas: str):
-    import eurostat
-    try:    # tik Lietuva ir ES – dideli rinkiniai (pvz. namq_10_gdp) siunčiami greitai
-        df = eurostat.get_data_df(kodas, filter_pars={"geo": SALYS})
+    try:
+        import eurostat
+        try:    # tik Lietuva ir ES – dideli rinkiniai (pvz. namq_10_gdp) siunčiami greitai
+            df = eurostat.get_data_df(kodas, filter_pars={"geo": SALYS})
+        except Exception:
+            df = eurostat.get_data_df(kodas)
+        if df is None or df.empty:
+            raise ValueError("tuščia lentelė")
     except Exception:
-        df = eurostat.get_data_df(kodas)
+        df = _atsisiusk_tsv(kodas)
     geo_col = next(c for c in df.columns if c.startswith("geo"))
     df = df[df[geo_col].isin(SALYS)].rename(columns={geo_col: "geo"})
     q_col = next((c for c in df.columns if c.startswith("quant")), None)
