@@ -11,7 +11,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from rodikliai import (brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
+from rodikliai import (bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
                        sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
 from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis
 
@@ -27,7 +27,8 @@ SRITYS = [
      "klausimas": "Ar piliečiai gauna geresnes viešąsias paslaugas?",
      "rodikliai": [sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai, brandos_egzaminai, issilavinimas]},
     {"nr": 3, "pavadinimas": "Ekonomika ir užimtumas",
-     "klausimas": "Ar ekonomika kuria gerovę ir darbo vietas?", "rodikliai": []},
+     "klausimas": "Ar ekonomika kuria gerovę ir darbo vietas?",
+     "rodikliai": [bvp, nedarbas, nasumas, infliacija, skola]},
     {"nr": 4, "pavadinimas": "Infrastruktūra ir aplinka",
      "klausimas": "Ar šalis gerina savo fizinę ir aplinkos infrastruktūrą?", "rodikliai": []},
     {"nr": 5, "pavadinimas": "Saugumas ir visuomenės valdymas",

@@ -20,6 +20,7 @@ rodikliai/
   svietimo_pasiekimai.py  # PUPP (NŠA) ir PISA (Eurostat)
   issilavinimas.py        # anksti mokslus palikę, aukštasis išsilavinimas (Eurostat)
   brandos_egzaminai.py    # VBE (NŠA)
+  bvp.py, nedarbas.py, nasumas.py, infliacija.py, skola.py   # 3 sritis (Eurostat; infliacija – ir ECB)
 irankiai/pupp_rezultatai.py  # NŠA PUPP PDF → duomenys/pupp_salies_eilutes.csv (paleisti kartą per metus)
 irankiai/vbe_rezultatai.py   # NŠA VBE PDF + Excel → duomenys/vbe_salies_eilutes.csv, vbe_mokyklu_vidurkiai.csv
 sablonai/                 # HTML šablonai (Jinja)
@@ -63,7 +64,10 @@ GitHub Actions svetainę perkuria **kasdien** (5:00 UTC) ir prieš tai atsisiun�
 - **Lietuvos duomenų portalas** (`api.dataportal.gov.lt`): S10R027, S7R329, S7R334. Lentelių pavadinimai –
   `rodikliai/saltiniai.py`. Naujai lentelei pavadinimą rasite rinkinio puslapyje: Eksportuoti → API endpoint.
 - **Eurostat** (paketas `eurostat`): `hlth_silc_08`, `hlth_cd_apr`, `demo_mlexpec`, `hlth_silc_01`,
-  `sdg_04_10`, `sdg_04_20`, `sdg_04_40`.
+  `sdg_04_10`, `sdg_04_20`, `sdg_04_40`, `namq_10_gdp`, `nama_10_pc`, `une_rt_m`, `lfsi_emp_q`,
+  `nama_10_lp_ulc`, `prc_hicp_manr`, `gov_10q_ggdebt`.
+- **ECB duomenų portalas** (`data-api.ecb.europa.eu`): SVKI metinis pokytis (Lietuva ir euro zona) – nuo 2026 m.,
+  nes Eurostat lentelė `prc_hicp_manr` pasibaigė 2025 m. gruodžio duomenimis.
 - **NŠA PUPP rezultatai** skelbiami tik PDF, todėl atnaujinami rankiniu būdu kartą per metus (rugpjūtį–rugsėjį):
   paleiskite `python irankiai/pupp_rezultatai.py` ir nukopijuokite sukurtą `pupp_salies_eilutes.csv` į `duomenys/`.
 - **NŠA VBE rezultatai**: 2013–2024 m. – PDF (`irankiai/vbe_rezultatai.py`), nuo 2025 m. – NŠA Excel „VBE vidurkiai
@@ -87,6 +91,11 @@ ATNAUJINTI=1 python generuoti.py
 | Išvengiamas mirtingumas dėl gydymo | rodiklis per metus sumažėja > 2 % | padidėja > 2 % | tarp jų |
 | Matematikos pasiekimai (PUPP) | nepasiekusių patenkinamo lygio dalis sumažėja > 2 p. p. | padidėja > 2 p. p. | tarp jų |
 | Matematikos VBE išlaikymas | išlaikiusiųjų dalis padidėja > 2 p. p. | sumažėja > 2 p. p. | tarp jų |
+| Realus BVP augimas | metinis augimas ≥ 1 % | BVP mažėja | 0–1 % |
+| Nedarbo lygis | per metus sumažėja > 0,3 p. p. | padidėja > 0,3 p. p. | tarp jų |
+| Darbo našumas | realus pokytis > +0,5 % | < −0,5 % | tarp jų |
+| Infliacija | priartėja prie 2 % tikslo > 0,5 p. p. (palyginti su prieš metus) | nutolsta > 0,5 p. p. | tarp jų |
+| Valdžios skola | santykis su BVP per metus sumažėja > 1 p. p. | padidėja > 1 p. p. | tarp jų |
 | Anksti mokslus palikę jaunuoliai | dalis sumažėja > 0,5 p. p. | padidėja > 0,5 p. p. | tarp jų |
 
 Taisyklės rodomos ir kiekvieno rodiklio puslapyje. Jas verta suderinti su darbo grupe.
