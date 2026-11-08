@@ -11,7 +11,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from rodikliai import (imigracija, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
+from rodikliai import (imigracija, migracijos_valdymas, senejimas, grizimas, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
                        sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
 from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis
 
@@ -34,9 +34,10 @@ SRITYS = [
      "rodikliai": [zuvusieji_keliuose, sesd_emisijos, atlieku_perdirbimas]},
     {"nr": 5, "pavadinimas": "Saugumas ir visuomenės valdymas",
      "klausimas": "Ar valstybė užtikrina saugumą ir veiksmingai valdo svarbiausius visuomenės iššūkius?",
-     "rodikliai": [nusikalstamumas, imigracija, gynybos_islaidos]},
+     "rodikliai": [nusikalstamumas, migracijos_valdymas, gynybos_islaidos]},
     {"nr": 6, "pavadinimas": "Demografija ir migracija",
-     "klausimas": "Ar šalies demografinė raida išlieka tvari?", "rodikliai": [gyventojai]},
+     "klausimas": "Ar šalies demografinė raida išlieka tvari ir ar valstybė geba valdyti gyventojų senėjimo bei migracijos iššūkius?",
+     "rodikliai": [gyventojai, senejimas, grizimas, imigracija]},
 ]
 
 BUSENOS = {

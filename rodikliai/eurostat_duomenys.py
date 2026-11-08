@@ -19,6 +19,10 @@ FILTRAI = {
     "migr_asyappctzm": {"age": "TOTAL", "sex": "T", "unit": "PER", "geo": ["LT"]},
     "gov_10a_exp": {"sector": "S13", "na_item": "TE", "cofog99": ["TOTAL", "GF02", "GF0201"]},
     "crim_off_cat": {"geo": ["LT"]},
+    "migr_emi1ctz": {"age": "TOTAL", "sex": "T", "agedef": "COMPLET", "unit": "NR"},
+    "migr_eiord": {"age": "TOTAL", "sex": "T", "unit": "PER", "geo": ["LT"]},
+    "migr_eipre": {"citizen": "TOTAL", "sex": "T", "age": "TOTAL", "unit": "PER", "geo": ["LT"]},
+    "migr_eirtn": {"age": "TOTAL", "sex": "T", "unit": "PER", "geo": ["LT"]},
 }
 
 

@@ -1,4 +1,4 @@
-"""5. Migracijos valdymas: imigrantai pagal pilietybę ir prieglobsčio prašymai (informacinis rodiklis)."""
+"""6. Imigracija ir grynoji migracija (informacinis rodiklis)."""
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -35,26 +35,15 @@ def rodiklis() -> Rodiklis:
     stilius(f1, "Imigrantai pagal pilietybę", "Atvykusių gyventi į Lietuvą asmenų skaičius per metus, tūkst.",
             "Šaltinis: Eurostat, migr_imm1ctz", vnt="", nulio_linija=False, metiniai=True)
 
-    # Prieglobsčio prašymai (pirmą kartą), mėnesiniai
-    a = lentele("migr_asyappctzm")
-    m = (a["geo"] == "LT") & (a["citizen"] == "TOTAL") & (a["applicant"] == "FRST")
-    for k, v in {"sex": "T", "age": "TOTAL", "unit": "PER"}.items():
-        if k in a.columns:
-            m &= a[k] == v
-    periodai = [c for c in a.columns if PERIODAS.match(str(c))]
-    prasymai = pd.to_numeric(a[m][periodai].iloc[0], errors="coerce").dropna()
-    prasymai.index = [_data(p) for p in prasymai.index]
-    prasymai = prasymai.sort_index()
-    p12 = prasymai.iloc[-12:].sum()
-    p12_pries = prasymai.iloc[-24:-12].sum()
-    pask_men = prasymai.index[-1]
-
+    # Grynoji tarptautinė migracija (visi asmenys)
+    neto = serija("demo_gind", "LT", indic_de="CNMIGRAT")
+    neto = neto[neto.index >= "2000-01-01"]
     f2 = go.Figure()
-    rodomi = prasymai[prasymai.index >= "2019-01-01"]
-    f2.add_trace(go.Bar(x=rodomi.index, y=rodomi.values, name="Prašymai per mėnesį", marker_color=SERIJOS[0],
-                        hovertemplate="%{x|%Y-%m}: %{y:.0f}<extra></extra>"))
-    stilius(f2, "Prieglobsčio prašymai", "Pirmą kartą pateikti prašymai Lietuvoje per mėnesį",
-            "Šaltinis: Eurostat, migr_asyappctzm", vnt="", nulio_linija=False)
+    f2.add_trace(go.Bar(x=neto.index, y=neto.values / 1000, name="Grynoji migracija",
+                        marker_color=[SERIJOS[2] if v >= 0 else SERIJOS[1] for v in neto.values],
+                        hovertemplate="%{x|%Y}: %{y:+.1f} tūkst.<extra></extra>"))
+    stilius(f2, "Grynoji tarptautinė migracija", "Atvykusieji minus išvykusieji, tūkst. per metus",
+            "Šaltinis: Eurostat, demo_gind", vnt="", metiniai=True)
     f2.update_layout(showlegend=False)
 
     lentele_df = (viso.rename("imigrantai_is_viso").to_frame().join(lt.rename("Lietuvos_piliečiai"))
@@ -64,7 +53,6 @@ def rodiklis() -> Rodiklis:
     lentele_df.insert(0, "metai", lentele_df.index.year)
 
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
-    men_pav = f"{pask_men.year}-{pask_men.month:02d}"
     return Rodiklis(
         id="imigracija",
         pavadinimas="Imigracija",
@@ -73,22 +61,23 @@ def rodiklis() -> Rodiklis:
         zenklas=False, spark_nuo_nulio=True,
         vertinimo_taisykle=("Informacinis rodiklis: imigracijos mastas savaime nevertinamas kaip gerėjimas ar "
                             "prastėjimas, todėl būsena nenustatoma. Stebima, kiek ir kas atvyksta, bei prieglobsčio "
-                            "prašymų dinamika."),
+                            "grynoji migracija."),
         vertinimo_paaiskinimas=(f"{metai} m. imigrantų skaičius – {_tukst(pask)} ({ankst} m. – "
                                 f"{_tukst(pries)}); imigracija {kryptis} {sk(abs(pokytis), False)} %. "
                                 f"Iš jų {_tukst(grizo)} – grįžtantys Lietuvos piliečiai ({sk(grizo / pask * 100, False, 0)} %). "
-                                f"Pirmų prieglobsčio prašymų per 12 mėn. iki {men_pav} – {_tukst(p12)} "
-                                f"(ankstesniais 12 mėn. – {_tukst(p12_pries)})."),
+                                f"Grynoji tarptautinė migracija – {_tukst(neto.iloc[-1]).replace('-', '−')} "
+                                f"({neto.index[-1].year} m.)."),
         sparkline=viso[viso.index >= nuo] / 1000,
         grafikai=[f1, f2],
         apibrezimas=("Imigrantai – asmenys, atvykę gyventi į Lietuvą bent 12 mėnesių (deklaravę gyvenamąją vietą), "
                      "pagal pilietybę. Prieglobsčio prašymai – pirmą kartą Lietuvoje pateikti tarptautinės "
                      "apsaugos prašymai."),
         pastabos=["2022 m. šuolį lėmė karo pabėgėliai iš Ukrainos.",
-                  "Metiniai imigracijos duomenys skelbiami su maždaug metų vėlavimu, prieglobsčio – kas mėnesį."],
+                  "Duomenys skelbiami su maždaug metų vėlavimu. Prieglobsčio prašymai ir neteisėta migracija "
+                  "rodomi 5 srityje („Neteisėtos migracijos valdymas“)."],
         saltiniai=[("Eurostat – migr_imm1ctz", "https://ec.europa.eu/eurostat/databrowser/view/migr_imm1ctz/default/table?lang=en"),
-                   ("Eurostat – migr_asyappctzm", "https://ec.europa.eu/eurostat/databrowser/view/migr_asyappctzm/default/table?lang=en")],
+                   ("Eurostat – demo_gind", "https://ec.europa.eu/eurostat/databrowser/view/demo_gind/default/table?lang=en")],
         papildomai=[(_tukst(grizo), f"grįžo Lietuvos piliečių, {metai} m."),
-                    (_tukst(p12), f"prieglobsčio prašymų per 12 mėn. iki {men_pav}")],
+                    (_tukst(neto.iloc[-1]).replace("-", "−"), f"grynoji migracija, {neto.index[-1].year} m.")],
         lentele=lentele_df,
     )
