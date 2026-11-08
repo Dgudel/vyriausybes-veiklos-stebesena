@@ -1,7 +1,7 @@
 """2.4 Švietimo rezultatai: anksti mokslus palikę jaunuoliai ir aukštasis išsilavinimas."""
 import plotly.graph_objects as go
 
-from .bendra import SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 0.5     # proc. punkto (LFS apklausa – mažesni pokyčiai gali būti atsitiktiniai)
@@ -45,7 +45,11 @@ def rodiklis() -> Rodiklis:
     lentele.insert(0, "metai", lentele.index.year)
 
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
+
+    _dalys = [dalis("Anksti mokslus palikę vaikinai", lt_v, "mazesne", SLENKSTIS),
+              dalis("Aukštasis išsilavinimas (25–34 m.)", alt, "didesne", SLENKSTIS)]
     return Rodiklis(
+        dalys=_dalys,
         id="anksti-mokslus-palike",
         pavadinimas="Anksti mokslus palikę jaunuoliai",
         trumpas_aprasas="18–24 m. jaunuolių",

@@ -1,7 +1,7 @@
 """4. Klimatas: šiltnamio efektą sukeliančių dujų (ŠESD) išmetimai."""
 import plotly.graph_objects as go
 
-from .bendra import SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 1.0     # % per metus
@@ -36,7 +36,11 @@ def rodiklis() -> Rodiklis:
     lentele.insert(0, "metai", lentele.index.year)
 
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
+
+    _dalys = [dalis("Grynieji išmetimai (su LULUCF)", grynieji, "mazesne", 0.2, vienetai=" mln. t", slenkscio_vnt=" mln. t"),
+              dalis("Išmetimai vienam gyventojui", vienam, "mazesne", 1.0, budas="proc", vienetai=" t")]
     return Rodiklis(
+        dalys=_dalys,
         id="sesd-emisijos",
         pavadinimas="Šiltnamio efektą sukeliančių dujų išmetimai",
         trumpas_aprasas="mln. t CO₂ ekv.",

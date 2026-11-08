@@ -2,7 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from .bendra import MENESIAI, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, palyginimo_tekstas, MENESIAI, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from . import ird
 from .eurostat_duomenys import serija
 
@@ -104,7 +104,21 @@ def rodiklis() -> Rodiklis:
     lentele = lentele.sort_values(["metai", "iki_menesio"])
 
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
+
+    _dalys = []
+    for vardas, s in [("Sukčiavimas", _metinis_pokytis(d, "reiksme_sukc")),
+                      ("Visos veikos", _metinis_pokytis(visos.rename(columns={"reiksme": "v"}), "v"))]:
+        dx = dalis(vardas, s, "mazesne", SLENKSTIS, budas="lygis", zenklas=True, slenkscio_vnt=" %")
+        dx.laikotarpis, dx.palyginimas = laikotarpis, palyginimo_tekstas(laikotarpis)
+        _dalys.append(dx)
+    for kodas, vardas in KATEGORIJOS[:4]:
+        try:
+            s = serija("crim_off_cat", "LT", iccs=kodas, unit="P_HTHAB")
+            _dalys.append(dalis(f"{vardas} (100 tūkst. gyv.)", s, "mazesne", 5.0, budas="proc", vienetai=""))
+        except Exception:
+            pass
     return Rodiklis(
+        dalys=_dalys,
         id="nusikalstamumas",
         pavadinimas="Nusikalstamumas (be sukčiavimo)",
         trumpas_aprasas="registruotų veikų pokytis per metus",

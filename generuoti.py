@@ -81,16 +81,22 @@ def main():
             if r.lentele is not None:
                 r.lentele.round(2).to_csv(ISVESTIS / "duomenys" / f"{r.id}.csv", index=False, encoding="utf-8-sig")
             rodikliai.append(r)
-        suvestine = {k: sum(r.busena == k for r in rodikliai) for k in BUSENOS}
+        for r in rodikliai:
+            r.visos_busenos = [r.busena] + [x.busena for x in r.dalys]
+            r.nesutampa = [x for x in r.dalys if x.busena in ("gereja", "stabilu", "prasteja") and x.busena != r.busena]
+        suvestine = {k: sum(b == k for r in rodikliai for b in r.visos_busenos) for k in BUSENOS}
         sritys.append({**sritis, "rodikliai": rodikliai, "suvestine": suvestine})
 
     bendri["meniu_sritys"] = sritys
     visi = [(s, r) for s in sritys for r in s["rodikliai"]]
-    bendra = {k: sum(r.busena == k for _, r in visi) for k in BUSENOS}
+    bendra = {k: sum(b == k for _, r in visi for b in r.visos_busenos) for k in BUSENOS}
+    pagrindiniai = {k: sum(r.busena == k for _, r in visi) for k in BUSENOS}
+    daliu_sk = sum(len([x for x in r.dalys if x.busena in ("gereja", "stabilu", "prasteja")]) for _, r in visi)
     vertinti = sum(bendra[k] for k in ("gereja", "stabilu", "prasteja"))
 
     (ISVESTIS / "index.html").write_text(
         env.get_template("index.html").render(sritys=sritys, bendra=bendra, vertinti=vertinti,
+                                              pagrindiniai=pagrindiniai, daliu_sk=daliu_sk,
                                               is_viso=len(visi), **bendri), encoding="utf-8")
     (ISVESTIS / "metodika.html").write_text(
         env.get_template("metodika.html").render(sritys=sritys, **bendri), encoding="utf-8")

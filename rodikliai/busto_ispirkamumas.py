@@ -1,7 +1,7 @@
 """1.2 Būsto įperkamumas: ar būstas brangsta greičiau nei auga atlyginimai."""
 import plotly.graph_objects as go
 
-from .bendra import SERIJOS, Rodiklis, ivertink, linijos, sk, stilius, zmoniu_laikotarpis
+from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius, zmoniu_laikotarpis
 from .saltiniai import (busto_kainu_indeksai, busto_kainu_pokytis, du_serija, ketvirtinis,
                         ketvirtis_is_datos)
 
@@ -58,7 +58,16 @@ def rodiklis() -> Rodiklis:
     lentele["laikotarpis"] = lentele["data"].map(ketvirtis_is_datos)
 
     kryptis = "greičiau" if skirtumas > 0 else "lėčiau"
+
+    _dalys = []
+    for t in ["Vilniaus m. sav.", "Kita šalies teritorija"]:
+        kt = busto_kainu_pokytis(t)
+        sk_ = (kt - neto_q).dropna()
+        _dalys.append(dalis(f"{t}: kainų ir atlyginimų augimo skirtumas", sk_, "mazesne", SLENKSTIS, budas="lygis",
+                            zenklas=True, vienetai=" p. p."))
+        _dalys[-1].pokytis = f"kainos {sk(kt[sk_.index[-1]])} %, atlyginimai {sk(neto_q[sk_.index[-1]])} %"
     return Rodiklis(
+        dalys=_dalys,
         id="busto-ispirkamumas",
         pavadinimas="Būsto įperkamumas",
         trumpas_aprasas="būsto kainos per metus",

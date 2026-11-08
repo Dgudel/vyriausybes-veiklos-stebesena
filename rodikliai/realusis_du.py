@@ -1,7 +1,7 @@
 """1.1 Realusis darbo užmokestis."""
 import plotly.graph_objects as go
 
-from .bendra import SERIJOS, Rodiklis, ivertink, linijos, sk, stilius, zmoniu_laikotarpis
+from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius, zmoniu_laikotarpis
 from .saltiniai import SEKTORIAI, du_serija, kainu_pokytis, laikotarpis_is_datos
 
 SALTINIS = "Šaltinis: Valstybės duomenų agentūra, rodiklis S10R027"
@@ -47,7 +47,11 @@ def rodiklis() -> Rodiklis:
                .join(neto.rename("neto_du_metinis_pokytis_proc")).reset_index())
     lentele["laikotarpis"] = lentele["data"].map(laikotarpis_is_datos)
 
+
+    _dalys = [dalis(f"{v}: realusis DU", du_serija("Realusis", v), "didesne", SLENKSTIS, budas="lygis",
+                    zenklas=True, slenkscio_vnt=" %") for v in ["Privatusis sektorius", "Viešasis sektorius"]]
     return Rodiklis(
+        dalys=_dalys,
         id="realusis-darbo-uzmokestis",
         pavadinimas="Realusis darbo užmokestis",
         trumpas_aprasas="per metus, šalies ūkyje",

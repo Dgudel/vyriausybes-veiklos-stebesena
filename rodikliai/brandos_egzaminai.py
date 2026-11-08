@@ -2,7 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from .bendra import DUOMENYS, SERIJOS, TEKSTAS_ANTR, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, DUOMENYS, SERIJOS, TEKSTAS_ANTR, Rodiklis, ivertink, linijos, sk, stilius
 
 SLENKSTIS = 2.0      # proc. punkto: egzamino užduotys kasmet skiriasi
 SALIS = "vbe_salies_eilutes.csv"                       # irankiai/vbe_rezultatai.py (2013–2024 m., PDF)
@@ -66,7 +66,12 @@ def rodiklis() -> Rodiklis:
 
     mat_med = med.loc[["Matematika (A)", "Matematika (B)"]]
     kryptis = "padidėjo" if pokytis > 0 else "sumažėjo"
+
+    _dalys = [dalis("Lietuvių k. ir literatūra: išlaikė", _serija(LKL, "islaike_proc"), "didesne", SLENKSTIS),
+              dalis("Matematika: 86–100 balų", _serija(MAT, "b86_100_proc"), "didesne", 1.0),
+              dalis("Lietuvių k.: 86–100 balų", _serija(LKL, "b86_100_proc"), "didesne", 1.0)]
     return Rodiklis(
+        dalys=_dalys,
         id="brandos-egzaminai",
         pavadinimas="Matematikos VBE išlaikymas",
         trumpas_aprasas="laikiusių mokinių išlaikė",

@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from .eurostat_duomenys import serija
-from .bendra import DUOMENYS, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, DUOMENYS, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 
 SLENKSTIS = 0.1     # proc. punkto
 
@@ -42,7 +42,10 @@ def rodiklis() -> Rodiklis:
                                     "Eurostat_COFOG_mln_EUR": es_mln.reindex(es_lt.index).values}),
                       on="metai", how="outer").sort_values("metai")
     zyma = " (įvertis)" if ivertis else ""
+
+    _dalys = [dalis("Valdžios išlaidos gynybai (Eurostat COFOG)", es_lt, "didesne", SLENKSTIS)]
     return Rodiklis(
+        dalys=_dalys,
         id="gynybos-islaidos",
         pavadinimas="Gynybos išlaidos",
         trumpas_aprasas="BVP dalis",

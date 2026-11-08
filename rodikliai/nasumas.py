@@ -1,5 +1,5 @@
 """3.3 Darbo našumas (Eurostat nama_10_lp_ulc)."""
-from .bendra import Rodiklis, ivertink, sk
+from .bendra import dalis, Rodiklis, ivertink, sk
 from .ekonomika_bendra import grafikas
 from .eurostat_duomenys import serija
 
@@ -33,7 +33,10 @@ def rodiklis() -> Rodiklis:
     lentele = lentele[lentele.index >= "2005-01-01"]
     lentele.insert(0, "metai", lentele.index.year)
 
+
+    _dalys = [dalis("Našumas, palyginti su ES (PGS, ES = 100)", lygis, "didesne", 1.0, vienetai="", slenkscio_vnt=" punkto")]
     return Rodiklis(
+        dalys=_dalys,
         id="darbo-nasumas", pavadinimas="Darbo našumas",
         trumpas_aprasas="realus pokytis per metus, vienai valandai", reiksme=pask, vienetai="%",
         laikotarpis=str(metai), busena=busena,

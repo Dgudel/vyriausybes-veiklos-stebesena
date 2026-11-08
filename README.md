@@ -114,3 +114,15 @@ ATNAUJINTI=1 python generuoti.py
 | Anksti mokslus palikę jaunuoliai | dalis sumažėja > 0,5 p. p. | padidėja > 0,5 p. p. | tarp jų |
 
 Taisyklės rodomos ir kiekvieno rodiklio puslapyje. Jas verta suderinti su darbo grupe.
+
+
+## Sudedamosios dalys
+
+Be pagrindinio rodiklio, kiekvienas papildomas Lietuvos matas, rodomas rodiklio grafikuose (pvz., sukčiavimas šalia
+nusikalstamumo be sukčiavimo, lietuvių kalba šalia matematikos, jaunimo nedarbas), turi savo vertinimą.
+Jis sukuriamas funkcija `dalis()` (`rodikliai/bendra.py`) ir perduodamas `Rodiklis(dalys=[...])`.
+Logika ta pati: naujausia reikšmė lyginama su tuo pačiu laikotarpiu prieš metus (metiniai – su ankstesniu tašku),
+pokytis mažesnis už slenkstį – stabilu. Visi šie vertinimai įskaičiuojami į bendrą suvestinę ir sričių korteles.
+Nevertinama: ES / NATO palyginimai, vieno skaičiaus išskaidymai (pvz., pagal kelio tipą ar pilietybę) ir
+rodiklio skaičiavimo įvestys (pvz., nominalūs atlyginimai realiojo DU rodiklyje). Prieglobsčio prašymai ir migracijos
+srautai rodomi kaip „Stebimas“.

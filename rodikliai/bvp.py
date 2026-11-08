@@ -1,5 +1,5 @@
 """3.1 Realus BVP augimas (Eurostat namq_10_gdp) ir BVP vienam gyventojui (nama_10_pc)."""
-from .bendra import Rodiklis, ivertink, sk, zmoniu_laikotarpis
+from .bendra import dalis, Rodiklis, ivertink, sk, zmoniu_laikotarpis
 from .ekonomika_bendra import grafikas
 from .eurostat_duomenys import laikotarpis, serija
 
@@ -31,7 +31,10 @@ def rodiklis() -> Rodiklis:
     lentele = lentele[lentele.index >= "2015-01-01"]
     lentele.insert(0, "laikotarpis", [laikotarpis(d, "Q") for d in lentele.index])
 
+
+    _dalys = [dalis("BVP vienam gyventojui (PGS, ES = 100)", pc_lt, "didesne", 1.0, vienetai="", slenkscio_vnt=" punkto")]
     return Rodiklis(
+        dalys=_dalys,
         id="bvp-augimas", pavadinimas="Realus BVP augimas",
         trumpas_aprasas="per metus", reiksme=pask, vienetai="%", laikotarpis=laik, busena=busena,
         vertinimo_taisykle=(f"Gerėja (ekonomika auga), kai realus BVP per metus išauga bent {sk(AUGIMAS_GERAS, False)} %; "

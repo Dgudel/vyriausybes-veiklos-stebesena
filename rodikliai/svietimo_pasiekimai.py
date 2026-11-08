@@ -2,7 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from .bendra import DUOMENYS, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, DUOMENYS, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 2.0     # proc. punkto: PUPP užduotys kasmet skirtingos, mažesni pokyčiai nelaikomi pokyčiu
@@ -78,7 +78,15 @@ def rodiklis() -> Rodiklis:
 
     pm_lt, pm_es = pisa["EF461"][0], pisa["EF461"][1]
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
+
+    _dalys = [dalis("Lietuvių k.: nepasiekė patenkinamo lygio", lt["nepasieke_proc"], "mazesne", SLENKSTIS),
+              dalis("Matematikos PUPP vidurkis", mat["vidurkis"], "didesne", 0.2, vienetai="", slenkscio_vnt=" balo", dec=2),
+              dalis("Lietuvių k. PUPP vidurkis", lt["vidurkis"], "didesne", 0.2, vienetai="", slenkscio_vnt=" balo", dec=2),
+              dalis("PISA: žemi pasiekimai – matematika", pisa["EF461"][0], "mazesne", SLENKSTIS),
+              dalis("PISA: žemi pasiekimai – skaitymas", pisa["READ"][0], "mazesne", SLENKSTIS),
+              dalis("PISA: žemi pasiekimai – gamtos mokslai", pisa["SCI"][0], "mazesne", SLENKSTIS)]
     return Rodiklis(
+        dalys=_dalys,
         id="svietimo-pasiekimai",
         pavadinimas="Matematikos pasiekimai (PUPP)",
         trumpas_aprasas="10 kl. mokinių nepasiekė patenkinamo lygio",

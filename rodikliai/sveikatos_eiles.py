@@ -1,7 +1,7 @@
 """2.1 Negavo gydymo dėl laukimo eilių (Eurostat apklausos rodiklis)."""
 import plotly.graph_objects as go
 
-from .bendra import SERIJOS, TEKSTAS_ANTR, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, SERIJOS, TEKSTAS_ANTR, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 KODAS = "hlth_silc_08"
@@ -59,7 +59,12 @@ def rodiklis() -> Rodiklis:
 
     santykis = pask / es.iloc[-1] if es.index[-1] == lt.index[-1] else None
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
+
+    _dalys = [dalis("Mažiausių pajamų 20 % gyventojų", q1, "mazesne", SLENKSTIS),
+              dalis("Didžiausių pajamų 20 % gyventojų", q5, "mazesne", SLENKSTIS),
+              dalis("Negavo dėl kainos, atstumo ar eilių", lt3, "mazesne", SLENKSTIS)]
     return Rodiklis(
+        dalys=_dalys,
         id="sveikatos-prieziuros-eiles",
         pavadinimas="Negavo gydymo dėl laukimo eilių",
         trumpas_aprasas="16 m. ir vyresnių gyventojų, apklausos duomenys",

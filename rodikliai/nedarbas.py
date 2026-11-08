@@ -1,5 +1,5 @@
 """3.2 Nedarbo lygis (Eurostat une_rt_m) ir užimtumo lygis (lfsi_emp_q)."""
-from .bendra import Rodiklis, ivertink, sk, zmoniu_laikotarpis
+from .bendra import dalis, Rodiklis, ivertink, sk, zmoniu_laikotarpis
 from .ekonomika_bendra import grafikas
 from .eurostat_duomenys import laikotarpis, serija
 
@@ -32,7 +32,11 @@ def rodiklis() -> Rodiklis:
     lentele.insert(0, "laikotarpis", [laikotarpis(d, "M") for d in lentele.index])
 
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
+
+    _dalys = [dalis("Jaunimo (iki 25 m.) nedarbas", jaun, "mazesne", 1.0),
+              dalis("Užimtumo lygis (20–64 m.)", u_lt, "didesne", SLENKSTIS)]
     return Rodiklis(
+        dalys=_dalys,
         id="nedarbas", pavadinimas="Nedarbo lygis",
         trumpas_aprasas="darbo jėgos", reiksme=pask, vienetai="%", laikotarpis=laik, busena=busena,
         zenklas=False, spark_nuo_nulio=True,

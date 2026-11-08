@@ -1,7 +1,7 @@
 """2.2 Sveikatos priežiūros rezultatai: išvengiamas mirtingumas dėl gydymo, gyvenimo trukmė."""
 import plotly.graph_objects as go
 
-from .bendra import SERIJOS, Rodiklis, linijos, sk, stilius, ivertink
+from .bendra import dalis, SERIJOS, Rodiklis, linijos, sk, stilius, ivertink
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 2.0     # % santykinis pokytis per metus – mažesnis laikomas stabiliu
@@ -57,7 +57,11 @@ def rodiklis() -> Rodiklis:
 
     kryptis = "sumažėjo" if pokytis_proc < 0 else "padidėjo"
     santykis = pask / trt_es.iloc[-1]
+
+    _dalys = [dalis("Tikėtina gyvenimo trukmė", gt_lt, "didesne", 0.2, vienetai=" m.", slenkscio_vnt=" m."),
+              dalis("Gerai vertinantys savo sveikatą", gs_lt, "didesne", 1.0)]
     return Rodiklis(
+        dalys=_dalys,
         id="sveikatos-prieziuros-rezultatai",
         pavadinimas="Išvengiamas mirtingumas dėl gydymo",
         trumpas_aprasas="mirčių 100 000 gyv.",
