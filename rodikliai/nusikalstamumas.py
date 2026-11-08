@@ -20,6 +20,19 @@ def _tukst(v: float) -> str:
     return f"{v:,.0f}".replace(",", " ")
 
 
+def _metinis_pokytis(d: pd.DataFrame, stulp: str) -> pd.Series:
+    """Kaupiamoji reikšmė, palyginta su tuo pačiu praėjusių metų mėnesiu, % (indeksas – mėnesio data)."""
+    d = d.dropna(subset=[stulp])
+    menesiniai = d.groupby("metai")["men"].nunique()
+    d = d[d.metai.isin(menesiniai[menesiniai > 1].index)]      # tik metai su mėnesiniais duomenimis
+    s = d.set_index(["metai", "men"])[stulp]
+    pries = s.copy()
+    pries.index = pd.MultiIndex.from_tuples([(m + 1, mm) for m, mm in pries.index], names=s.index.names)
+    p = ((s / pries - 1) * 100).dropna()
+    p.index = pd.to_datetime([f"{m}-{mm:02d}-01" for m, mm in p.index])
+    return p.sort_index()
+
+
 def rodiklis() -> Rodiklis:
     visos = ird.lentele(VISOS_ITEM, "ird_visos_veikos.csv")
     sukc = ird.lentele(SUKC_ITEM, "ird_sukciavimas.csv")
@@ -50,19 +63,22 @@ def rodiklis() -> Rodiklis:
     stilius(f1, "Užregistruotos nusikalstamos veikos", "Tūkst. per metus",
             "Šaltinis: IRD prie VRM, Nusikalstamų veikų žinybinis registras", vnt="", nulio_linija=False, metiniai=True)
 
-    # Kaupiamai nuo metų pradžios: šie ir praėję metai
+    # Pokytis, palyginti su tuo pačiu laikotarpiu prieš metus (kaupiamieji duomenys lyginami su kaupiamaisiais)
     f2 = go.Figure()
-    for i, m in enumerate([metai - 1, metai]):
-        s = d[d.metai == m].set_index("men")["be_sukc"].sort_index()
-        f2.add_trace(go.Scatter(x=list(s.index), y=s.values / 1000,
-                                name=f"{m} m.", mode="lines+markers",
-                                line=dict(color=SERIJOS[1 - i] if i == 0 else SERIJOS[0], width=3 if i else 2,
-                                          dash=None if i else "dot"),
-                                hovertemplate=f"{m} m.: %{{y:.1f}} tūkst.<extra></extra>"))
-    stilius(f2, "Šie metai palyginti su praėjusiais", "Nusikalstamos veikos be sukčiavimo, kaupiamai nuo sausio, tūkst.",
-            "Šaltinis: IRD prie VRM", vnt="", nulio_linija=False)
-    f2.update_yaxes(rangemode="tozero")
-    f2.update_xaxes(tickmode="array", tickvals=list(range(1, 13)), ticktext=TRUMPI, range=[0.5, 12.5])
+    f2.add_hrect(y0=-SLENKSTIS, y1=SLENKSTIS, fillcolor="#9a9994", opacity=0.12, line_width=0,
+                 annotation_text=f"stabilu (±{sk(SLENKSTIS, False, 0)} %)", annotation_position="top left",
+                 annotation_font=dict(size=11, color="#6b6b6b"))
+    serijos = [("Visos veikos", _metinis_pokytis(visos.rename(columns={"reiksme": "v"}), "v"), "#9a9994"),
+               ("Be sukčiavimo", _metinis_pokytis(d, "be_sukc"), SERIJOS[0]),
+               ("Sukčiavimas", _metinis_pokytis(d, "reiksme_sukc"), SERIJOS[1])]
+    serijos = [(v, s[s.index >= "2019-01-01"], c) for v, s, c in serijos if len(s[s.index >= "2019-01-01"])]
+    linijos(f2, serijos, vnt=" %", zenklas=True, dec=1)
+    stilius(f2, "Pokytis, palyginti su tuo pačiu laikotarpiu prieš metus",
+            "Užregistruota nuo metų pradžios iki nurodyto mėnesio, palyginti su tuo pačiu praėjusių metų laikotarpiu, %",
+            "Šaltinis: IRD prie VRM", vnt=" %")
+    f2.update_traces(hovertemplate="%{fullData.name}: %{y:+.1f} %<br>%{x|%Y-%m}<extra></extra>",
+                     selector=dict(type="scatter", mode="lines"))
+    f2.update_xaxes(tickformat="%Y", dtick="M12")
 
     # Eurostat: kategorijos 100 tūkst. gyv., indeksas (2016 = 100)
     f3 = go.Figure()
@@ -107,7 +123,9 @@ def rodiklis() -> Rodiklis:
                      "(nusikaltimai ir baudžiamieji nusižengimai), atėmus sukčiavimą (BK 182 str.). Sukčiavimas "
                      "atskiriamas, nes jo, ypač nuotolinio, skaičius sparčiai kinta dėl kitų priežasčių nei "
                      "bendras saugumas gatvėse ir namuose."),
-        pastabos=["Rodikliai kaupiami nuo metų pradžios, todėl lyginama su tuo pačiu praėjusių metų laikotarpiu.",
+        pastabos=["IRD skelbia kaupiamuosius duomenis (nuo metų pradžios), todėl jų skaičius per metus visada auga. "
+                  "Kad tai nebūtų klaidinanti, antrasis grafikas rodo pokytį, palyginti su tuo pačiu praėjusių metų "
+                  "laikotarpiu: pvz., 2026 m. sausis–spalis lyginamas su 2025 m. sausiu–spaliu.",
                   "Registruotų veikų skaičius priklauso ir nuo to, kiek žmonės praneša policijai."],
         saltiniai=[("IRD – visos užregistruotos nusikalstamos veikos",
                     f"https://www.ird.lt/lt/indicators/opendata/item.{VISOS_ITEM}"),
