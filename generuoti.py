@@ -60,7 +60,9 @@ def main():
     env.filters["sk"] = sk
     env.filters["laikotarpis"] = zmoniu_laikotarpis
     from plotly.offline import get_plotlyjs_version
-    bendri = {"busenos": BUSENOS, "atnaujinta": date.today().strftime("%Y-%m-%d"),
+    import hashlib
+    css_versija = hashlib.md5((SAKNIS / "statika" / "stilius.css").read_bytes()).hexdigest()[:8]
+    bendri = {"busenos": BUSENOS, "atnaujinta": date.today().strftime("%Y-%m-%d"), "css_versija": css_versija,
               "plotlyjs_versija": get_plotlyjs_version()}
 
     sritys = []
@@ -82,6 +84,7 @@ def main():
         suvestine = {k: sum(r.busena == k for r in rodikliai) for k in BUSENOS}
         sritys.append({**sritis, "rodikliai": rodikliai, "suvestine": suvestine})
 
+    bendri["meniu_sritys"] = sritys
     visi = [(s, r) for s in sritys for r in s["rodikliai"]]
     bendra = {k: sum(r.busena == k for _, r in visi) for k in BUSENOS}
     vertinti = sum(bendra[k] for k in ("gereja", "stabilu", "prasteja"))
@@ -96,7 +99,7 @@ def main():
         kitas = visi[i + 1][1] if i + 1 < len(visi) else None
         (ISVESTIS / "rodikliai" / f"{r.id}.html").write_text(
             env.get_template("rodiklis.html").render(r=r, sritis=sritis, ankstesnis=ankstesnis, kitas=kitas,
-                                                     sritys=sritys, **bendri), encoding="utf-8")
+                                                     **bendri), encoding="utf-8")
     (ISVESTIS / ".nojekyll").touch()   # GitHub Pages: neapdoroti per Jekyll
     print(f"✅ Svetainė sugeneruota: {ISVESTIS}")
 

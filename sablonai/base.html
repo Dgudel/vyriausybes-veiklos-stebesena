@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}Vyriausybės veiklos stebėsena{% endblock %}</title>
 <meta name="description" content="Vyriausybės veiklos stebėsenos sistema: rodikliai, jų kitimas ir vertinimas.">
-<link rel="stylesheet" href="{{ kelias }}statika/stilius.css">
+<link rel="stylesheet" href="{{ kelias }}statika/stilius.css?v={{ css_versija }}">
 {% block head %}{% endblock %}
 </head>
 <body>
@@ -13,6 +13,24 @@
   <div class="plotis">
     <a class="logo" href="{{ kelias }}index.html">Vyriausybės veiklos stebėsena</a>
     <span class="prototipas">Prototipas</span>
+    <nav class="meniu" aria-label="Pagrindinis meniu">
+      <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}index.html#suvestine">Suvestinė</a>
+      <details class="meniu-sritys">
+        <summary>Sritys <span aria-hidden="true" class="rodykle">▾</span></summary>
+        <div class="meniu-skydas">
+          <a class="meniu-siaura" href="{{ kelias }}index.html#suvestine">Suvestinė</a>
+          {% for s in meniu_sritys %}
+          <a href="{{ kelias }}index.html#sritis-{{ s.nr }}">
+            <span class="meniu-nr">{{ s.nr }}</span>
+            <span class="meniu-pav">{{ s.pavadinimas }}</span>
+            <span class="meniu-taskai" aria-hidden="true">{% for r in s.rodikliai %}<i class="t-{{ r.busena }}"></i>{% endfor %}</span>
+          </a>
+          {% endfor %}
+          <a class="meniu-siaura" href="{{ kelias }}metodika.html">Vertinimo metodika</a>
+        </div>
+      </details>
+      <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}metodika.html">Metodika</a>
+    </nav>
   </div>
 </header>
 <main class="plotis">
@@ -25,5 +43,12 @@
     Duomenys tikrinami kasdien; puslapis atnaujintas {{ atnaujinta }}. <a href="{{ kelias }}metodika.html">Vertinimo metodika</a>.
   </div>
 </footer>
+<script>
+  // Uždaryti meniu paspaudus nuorodą arba už jo ribų
+  document.addEventListener("click", function (e) {
+    var m = document.querySelector(".meniu-sritys");
+    if (m && m.open && (!m.contains(e.target) || e.target.closest(".meniu-skydas a"))) m.open = false;
+  });
+</script>
 </body>
 </html>

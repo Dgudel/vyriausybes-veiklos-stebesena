@@ -12,50 +12,58 @@
      laikomas stabiliu. <a href="metodika.html">Visos vertinimo taisyklės →</a></p>
 </section>
 
-<section class="bendra" aria-labelledby="bendra-pav">
-  <div class="bendra-galva">
-    <h2 id="bendra-pav">Bendras vaizdas</h2>
-    <p class="bendra-skaiciai">
-      {% for k in ["gereja", "stabilu", "prasteja"] %}
-      <span class="bendra-sk bendra-sk-{{ k }}"><b>{{ bendra[k] }}</b> <span><span aria-hidden="true">{{ busenos[k].ikona }}</span> {{ busenos[k].zodis|lower }}</span></span>
+<section class="apzvalga" id="suvestine" aria-labelledby="suv-pav">
+  <h2 id="suv-pav" class="sr-only">Bendras vaizdas</h2>
+  <div class="suv-bendra">
+    {% set C = 100 %}
+    {% set dalis = namespace(poslinkis=25) %}
+    <svg class="spurga" viewBox="0 0 42 42" role="img"
+         aria-label="Iš {{ vertinti }} vertinamų rodiklių: gerėja {{ bendra.gereja }}, stabilu {{ bendra.stabilu }}, prastėja {{ bendra.prasteja }}">
+      <circle cx="21" cy="21" r="15.915" fill="none" stroke="var(--linija)" stroke-width="5"/>
+      {% for k in ["gereja", "stabilu", "prasteja"] if bendra[k] %}
+      {% set p = bendra[k] / vertinti * C %}
+      <circle class="spurga-{{ k }}" cx="21" cy="21" r="15.915" fill="none" stroke-width="5"
+              stroke-dasharray="{{ '%.2f' % (p - 0.6) }} {{ '%.2f' % (C - p + 0.6) }}" stroke-dashoffset="{{ '%.2f' % dalis.poslinkis }}"/>
+      {% set dalis.poslinkis = dalis.poslinkis - p %}
       {% endfor %}
-      <span class="bendra-is">iš {{ vertinti }} vertinamų rodiklių{% if bendra.info %} (+{{ bendra.info }} stebimas){% endif %}</span>
-    </p>
-    <div class="juosta" role="img" aria-label="Gerėja {{ bendra.gereja }}, stabilu {{ bendra.stabilu }}, prastėja {{ bendra.prasteja }}">
-      {% for k in ["gereja", "stabilu", "prasteja"] if bendra[k] %}<span class="juosta-{{ k }}" style="flex: {{ bendra[k] }}"></span>{% endfor %}
+      <text x="21" y="20.5" class="spurga-sk">{{ bendra.gereja }}/{{ vertinti }}</text>
+      <text x="21" y="26" class="spurga-tekstas">gerėja</text>
+    </svg>
+    <div class="suv-legenda">
+      <h3>Bendras vaizdas</h3>
+      {% for k in ["gereja", "stabilu", "prasteja"] %}
+      <div class="suv-eil suv-{{ k }}"><span class="suv-ikona" aria-hidden="true">{{ busenos[k].ikona }}</span>
+        <b>{{ bendra[k] }}</b> {{ busenos[k].zodis|lower }}</div>
+      {% endfor %}
+      {% if bendra.info %}<div class="suv-eil suv-info"><span class="suv-ikona" aria-hidden="true">◆</span> <b>{{ bendra.info }}</b> stebimas, nevertinamas</div>{% endif %}
+      <a class="suv-metodika" href="metodika.html">Kaip vertinama →</a>
     </div>
   </div>
 
-  <div class="matrica">
+  <div class="suv-sritys">
     {% for s in sritys %}
-    <div class="matrica-eil">
-      <a class="matrica-sritis" href="#sritis-{{ s.nr }}"><span class="matrica-nr">{{ s.nr }}</span> {{ s.pavadinimas }}</a>
-      <ul class="matrica-rodikliai">
-        {% for r in s.rodikliai %}
-        <li><a class="mini mini-{{ r.busena }}" href="rodikliai/{{ r.id }}.html" title="{{ busenos[r.busena].zodis }}: {{ r.reiksme|sk(r.zenklas, r.dec) }}{{ r.vienetai }} ({{ r.laikotarpis|laikotarpis }})">
-          <span class="mini-ikona" aria-hidden="true">{{ busenos[r.busena].ikona }}</span>
-          <span class="mini-pav">{{ r.pavadinimas }}</span>
-          <span class="sr-only">– {{ busenos[r.busena].zodis }}</span>
-        </a></li>
-        {% endfor %}
-      </ul>
-    </div>
+    {% set g = s.rodikliai|selectattr("busena", "equalto", "gereja")|list|length %}
+    {% set st = s.rodikliai|selectattr("busena", "equalto", "stabilu")|list|length %}
+    {% set pr = s.rodikliai|selectattr("busena", "equalto", "prasteja")|list|length %}
+    <a class="sr-kortele" href="#sritis-{{ s.nr }}">
+      <span class="sr-galva"><span class="sr-nr">{{ s.nr }}</span><span class="sr-pav">{{ s.pavadinimas }}</span></span>
+      <span class="segmentai" aria-hidden="true">
+        {% for r in s.rodikliai %}<span class="seg seg-{{ r.busena }}" title="{{ r.pavadinimas }}: {{ busenos[r.busena].zodis }}"></span>{% endfor %}
+      </span>
+      <span class="sr-sarasas">
+        {% for r in s.rodikliai %}<span class="sr-rod"><i class="t-{{ r.busena }}" aria-hidden="true"></i>{{ r.pavadinimas }}<span class="sr-only"> – {{ busenos[r.busena].zodis }}</span></span>{% endfor %}
+      </span>
+      <span class="sr-skaiciai">
+        {% if g %}<span class="c-gereja">▲ {{ g }}</span>{% endif %}
+        {% if st %}<span class="c-stabilu">■ {{ st }}</span>{% endif %}
+        {% if pr %}<span class="c-prasteja">▼ {{ pr }}</span>{% endif %}
+        <span class="sr-is">iš {{ s.rodikliai|length }} rodiklių</span>
+      </span>
+      <span class="sr-only">Gerėja {{ g }}, stabilu {{ st }}, prastėja {{ pr }}.</span>
+    </a>
     {% endfor %}
   </div>
-  <ul class="legenda" aria-label="Būsenų reikšmės">
-    {% for k in ["gereja", "stabilu", "prasteja", "info"] %}
-    <li><span class="zyme zyme-{{ k }}"><span aria-hidden="true">{{ busenos[k].ikona }}</span> {{ busenos[k].zodis }}</span></li>
-    {% endfor %}
-    <li class="legenda-pastaba">„Stebimas“ – rodiklis rodomas, bet nevertinamas, nes jo kryptis savaime nėra nei gera, nei bloga.</li>
-  </ul>
 </section>
-
-<nav class="sriciu-nav" aria-label="Sritys">
-  <div class="sriciu-nav-vidus">
-  {% for s in sritys %}<a href="#sritis-{{ s.nr }}">{{ s.nr }}. {{ s.trumpai }}</a>{% endfor %}
-  <a class="i-virsu" href="#bendra-pav">↑ Suvestinė</a>
-  </div>
-</nav>
 
 {% for s in sritys %}
 <section class="sritis{% if not s.rodikliai %} sritis-rengiama{% endif %}" id="sritis-{{ s.nr }}">
