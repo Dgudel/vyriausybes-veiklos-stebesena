@@ -42,6 +42,7 @@ a { color: var(--akcentas); }
 .zyme-stabilu { color: var(--stabilu); }
 .zyme-prasteja { color: var(--prasteja); }
 .zyme-nera { color: var(--nera); }
+.zyme-info { color: #4a6fa5; }
 
 /* Sritis */
 .sritis { margin-top: 40px; }
@@ -63,6 +64,7 @@ a { color: var(--akcentas); }
 .kortele:hover, .kortele:focus-visible { box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateY(-1px); }
 .kortele-gereja { border-top-color: var(--gereja); }
 .kortele-stabilu { border-top-color: #fab219; }
+.kortele-info { border-top-color: #4a6fa5; }
 .kortele-prasteja { border-top-color: var(--prasteja); }
 .kortele-virsus { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .kortele h3 { margin: 0; font-size: 16px; line-height: 1.3; }
@@ -88,6 +90,7 @@ a { color: var(--akcentas); }
   border-radius: var(--spindulys); padding: 16px 18px; }
 .vertinimas-gereja { border-left-color: var(--gereja); }
 .vertinimas-stabilu { border-left-color: #fab219; }
+.vertinimas-info { border-left-color: #4a6fa5; }
 .vertinimas-prasteja { border-left-color: var(--prasteja); }
 .vertinimas p { margin: 10px 0 0; }
 .taisykle { font-size: 14px; color: var(--tekstas-antr); }

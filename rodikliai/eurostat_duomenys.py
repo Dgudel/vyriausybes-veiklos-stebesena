@@ -13,6 +13,14 @@ from .bendra import DUOMENYS
 
 SALYS = ["LT", "EU27_2020"]
 
+# Didelėms lentelėms – papildomi filtrai, kad atsisiuntimas būtų greitas
+FILTRAI = {
+    "migr_imm1ctz": {"age": "TOTAL", "sex": "T", "agedef": "COMPLET", "unit": "NR"},
+    "migr_asyappctzm": {"age": "TOTAL", "sex": "T", "unit": "PER", "geo": ["LT"]},
+    "gov_10a_exp": {"sector": "S13", "na_item": "TE", "cofog99": ["TOTAL", "GF02", "GF0201"]},
+    "crim_off_cat": {"geo": ["LT"]},
+}
+
 
 def tsv_i_lentele(tekstas: str) -> pd.DataFrame:
     """Eurostat TSV (pirmas stulpelis „freq,unit,...,geo\\TIME_PERIOD“, reikšmės su žymomis „8.4 e“, „:“)
@@ -38,17 +46,40 @@ def _atsisiusk_tsv(kodas: str) -> pd.DataFrame:
     return tsv_i_lentele(r.text)
 
 
+def _atsisiusk_sdmx3(kodas: str, filtrai: dict) -> pd.DataFrame:
+    """SDMX 3.0 API su filtru serveryje (tik LT ir ES) – tinka ir didelėms lentelėms."""
+    import io
+    import requests
+    url = f"https://ec.europa.eu/eurostat/api/dissemination/sdmx/3.0/data/dataflow/ESTAT/{kodas}/1.0/*"
+    kitos = {f"c[{k}]": ",".join(v) if isinstance(v, list) else v for k, v in filtrai.items() if k != "geo"}
+    for salys in (filtrai.get("geo", SALYS), ["LT"]):   # kai kuriose lentelėse ES sumos nėra (tada 400)
+        r = requests.get(url, params={"c[geo]": ",".join(salys), **kitos, "format": "csvdata",
+                                      "formatVersion": "2.0", "compress": "false"}, timeout=300)
+        if r.status_code == 400 and salys != ["LT"]:
+            continue
+        r.raise_for_status()
+        d = pd.read_csv(io.StringIO(r.text), dtype=str)
+        tarnybiniai = {"STRUCTURE", "STRUCTURE_ID", "STRUCTURE_NAME", "TIME_PERIOD", "CONF_STATUS"}
+        dims = [c for c in d.columns if c not in tarnybiniai and not c.startswith("OBS_")]
+        d["OBS_VALUE"] = pd.to_numeric(d["OBS_VALUE"], errors="coerce")
+        d[dims] = d[dims].fillna("")
+        return d.pivot_table(index=dims, columns="TIME_PERIOD", values="OBS_VALUE", aggfunc="first").reset_index()
+    raise ValueError("SDMX 3.0: nepavyko")
+
+
 def _atsisiusk(kodas: str):
-    try:
+    df = None
+    filtrai = {"geo": SALYS, **FILTRAI.get(kodas, {})}
+    try:        # 1) paketas eurostat su filtrais
         import eurostat
-        try:    # tik Lietuva ir ES – dideli rinkiniai (pvz. namq_10_gdp) siunčiami greitai
-            df = eurostat.get_data_df(kodas, filter_pars={"geo": SALYS})
-        except Exception:
-            df = eurostat.get_data_df(kodas)
-        if df is None or df.empty:
-            raise ValueError("tuščia lentelė")
+        df = eurostat.get_data_df(kodas, filter_pars=filtrai)
     except Exception:
-        df = _atsisiusk_tsv(kodas)
+        pass
+    if df is None or df.empty:
+        try:    # 2) SDMX 3.0 su filtru serveryje
+            df = _atsisiusk_sdmx3(kodas, filtrai)
+        except Exception:
+            df = _atsisiusk_tsv(kodas)      # 3) visa lentelė TSV formatu
     geo_col = next(c for c in df.columns if c.startswith("geo"))
     df = df[df[geo_col].isin(SALYS)].rename(columns={geo_col: "geo"})
     q_col = next((c for c in df.columns if c.startswith("quant")), None)

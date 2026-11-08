@@ -11,7 +11,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from rodikliai import (atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
+from rodikliai import (imigracija, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
                        sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
 from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis
 
@@ -34,7 +34,7 @@ SRITYS = [
      "rodikliai": [zuvusieji_keliuose, sesd_emisijos, atlieku_perdirbimas]},
     {"nr": 5, "pavadinimas": "Saugumas ir visuomenės valdymas",
      "klausimas": "Ar valstybė užtikrina saugumą ir veiksmingai valdo svarbiausius visuomenės iššūkius?",
-     "rodikliai": []},
+     "rodikliai": [nusikalstamumas, imigracija, gynybos_islaidos]},
     {"nr": 6, "pavadinimas": "Demografija ir migracija",
      "klausimas": "Ar šalies demografinė raida išlieka tvari?", "rodikliai": [gyventojai]},
 ]
@@ -43,6 +43,7 @@ BUSENOS = {
     "gereja":   {"zodis": "Gerėja",   "ikona": "▲"},
     "stabilu":  {"zodis": "Stabilu",  "ikona": "■"},
     "prasteja": {"zodis": "Prastėja", "ikona": "▼"},
+    "info":     {"zodis": "Stebimas", "ikona": "◆"},
     "nera":     {"zodis": "Nėra duomenų", "ikona": "○"},
 }
 

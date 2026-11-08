@@ -53,7 +53,7 @@ def rodiklis() -> Rodiklis:
         zenklas=False, spark_nuo_nulio=True,
         vertinimo_taisykle=(f"Gerėja, kai rodiklis per metus sumažėja daugiau nei {sk(SLENKSTIS, False)} "
                             f"žuvusiojo 100 tūkst. gyv.; prastėja, kai tiek pat padidėja; kitu atveju – stabilu."),
-        vertinimo_paaiskinimas=(f"{metai} m. keliuose žuvo {sk(sk_lt.iloc[-1], False, 0)} žmonės – "
+        vertinimo_paaiskinimas=(f"{metai} m. žuvusiųjų keliuose – {sk(sk_lt.iloc[-1], False, 0)}, arba "
                                 f"{sk(pask, False)} 100 tūkst. gyventojų ({ankst} m. – {sk(pries, False)}). "
                                 f"Rodiklis {kryptis} {sk(abs(pokytis), False)}; ES vidurkis – {sk(es.iloc[-1], False)}."),
         sparkline=lt[lt.index >= nuo],
