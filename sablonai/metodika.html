@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set kelias = "" %}
+{% block title %}Vertinimo metodika · Vyriausybės veiklos stebėsena{% endblock %}
+{% block turinys %}
+<nav class="kelias-nav"><a href="index.html">← Švieslentė</a></nav>
+<section class="ivadas metodika-ivadas">
+  <h1>Kaip vertinama: gerėja, stabilu ar prastėja</h1>
+  <p>Kiekvieno rodiklio būsena nustatoma automatiškai pagal iš anksto paskelbtą taisyklę, todėl vertinimas
+     nepriklauso nuo to, kas ir kada jį skaičiuoja.</p>
+  <ol class="metodika-zingsniai">
+    <li><b>Su kuo lyginama.</b> Naujausia reikšmė lyginama su <b>tuo pačiu laikotarpiu prieš metus</b>
+        (mėnesiniai duomenys – su tuo pačiu mėnesiu, ketvirtiniai – su tuo pačiu ketvirčiu, metiniai – su ankstesniais
+        metais). Taip neatsiranda sezoninių svyravimų: pvz., šildymo sezono kainos lyginamos su praėjusio šildymo sezono.
+        Su ankstesniu mėnesiu ar pagal ilgalaikį trendą nelyginama.</li>
+    <li><b>Kryptis.</b> Kiekvienam rodikliui nustatyta, kuri kryptis yra gera (pvz., nedarbo – mažėjimas,
+        atlyginimų – augimas).</li>
+    <li><b>Slenkstis.</b> Pokytis, mažesnis už rodikliui nustatytą slenkstį, laikomas <b>stabiliu</b> – taip
+        atsitiktiniai svyravimai ir apklausų paklaida nerodomi kaip gerėjimas ar prastėjimas.</li>
+    <li><b>Išimtys.</b> Keli rodikliai patys yra metiniai pokyčiai (pvz., realusis darbo užmokestis, BVP augimas) arba
+        palyginimai (būsto ir energijos kainos – su atlyginimų augimu), todėl vertinamas jų dydis. Gyventojų kaita
+        vertinama pagal tai, ar gyventojų daugėja, ar mažėja. Imigracija rodoma be vertinimo (◆ Stebimas).</li>
+  </ol>
+</section>
+
+{% for s in sritys %}
+<section class="metodika-sritis">
+  <h2>{{ s.nr }}. {{ s.pavadinimas }}</h2>
+  <div class="lentele-wrap">
+  <table class="metodika-lentele">
+    <thead><tr><th>Rodiklis</th><th>Dabartinė būsena</th><th>Palyginimo pagrindas</th><th>Taisyklė</th></tr></thead>
+    <tbody>
+    {% for r in s.rodikliai %}
+    <tr>
+      <td><a href="rodikliai/{{ r.id }}.html">{{ r.pavadinimas }}</a></td>
+      <td><span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span></td>
+      <td>{{ r.palyginimas|capitalize if r.palyginimas else "–" }}</td>
+      <td>{{ r.vertinimo_taisykle }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

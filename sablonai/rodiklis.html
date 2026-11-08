@@ -18,7 +18,8 @@
   <div class="vertinimas vertinimas-{{ r.busena }}">
     <span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span>
     {% if r.vertinimo_paaiskinimas %}<p>{{ r.vertinimo_paaiskinimas }}</p>{% endif %}
-    <p class="taisykle"><b>Kaip vertinama.</b> {{ r.vertinimo_taisykle }}</p>
+    {% if r.palyginimas and r.busena != "info" %}<p class="taisykle"><b>Palyginimo pagrindas:</b> {{ r.palyginimas }}.</p>{% endif %}
+    <p class="taisykle"><b>Kaip vertinama.</b> {{ r.vertinimo_taisykle }} <a href="../metodika.html">Visos taisyklės</a></p>
   </div>
 </section>
 
@@ -52,4 +53,8 @@
     {% endif %}
   </div>
 </section>
+<nav class="ankst-kitas" aria-label="Kiti rodikliai">
+  {% if ankstesnis %}<a href="{{ ankstesnis.id }}.html"><span>← Ankstesnis</span><b>{{ ankstesnis.pavadinimas }}</b></a>{% else %}<span></span>{% endif %}
+  {% if kitas %}<a class="kitas" href="{{ kitas.id }}.html"><span>Kitas →</span><b>{{ kitas.pavadinimas }}</b></a>{% endif %}
+</nav>
 {% endblock %}

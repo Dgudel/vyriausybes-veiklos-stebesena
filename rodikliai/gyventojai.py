@@ -48,6 +48,7 @@ def rodiklis() -> Rodiklis:
         trumpas_aprasas="1000 gyventojų per metus",
         reiksme=pask, vienetai="‰", laikotarpis=str(metai), busena=busena,
         zenklas=True, spark_nuo_nulio=True,
+        palyginimas="vertinamas metinės kaitos dydis",
         vertinimo_taisykle=(f"Vertinamas kaitos lygis: gerėja, kai gyventojų skaičius per metus padidėja daugiau "
                             f"nei {sk(SLENKSTIS, False)} ‰; prastėja, kai sumažėja daugiau nei {sk(SLENKSTIS, False)} ‰; "
                             f"kitu atveju – stabilu."),

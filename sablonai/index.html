@@ -3,15 +3,59 @@
 {% block turinys %}
 <section class="ivadas">
   <h1>Ar Lietuvai sekasi geriau?</h1>
-  <p>Šešios politikos sritys, kiekvienoje – keli reguliariai atnaujinami rodikliai.
-     Kiekvienas rodiklis vertinamas pagal iš anksto nustatytą taisyklę: <b>gerėja</b>, <b>stabilu</b> arba <b>prastėja</b>.
+  <p>Šešios politikos sritys, {{ is_viso }} reguliariai atnaujinami rodikliai. Kiekvienas rodiklis vertinamas pagal
+     iš anksto nustatytą taisyklę: <b>gerėja</b>, <b>stabilu</b> arba <b>prastėja</b>.
      Paspaudę rodiklį pamatysite grafikus, apibrėžimą ir šaltinius.</p>
+  <p class="metodas"><b>Kaip vertinama?</b> Naujausia reikšmė lyginama <b>su tuo pačiu laikotarpiu prieš metus</b>:
+     mėnesiniai duomenys – su tuo pačiu praėjusių metų mėnesiu, ketvirtiniai – su tuo pačiu ketvirčiu, metiniai – su
+     ankstesniais metais. Taip išvengiama sezoninių svyravimų. Pokytis, mažesnis už rodikliui nustatytą slenkstį,
+     laikomas stabiliu. <a href="metodika.html">Visos vertinimo taisyklės →</a></p>
+</section>
+
+<section class="bendra" aria-labelledby="bendra-pav">
+  <div class="bendra-galva">
+    <h2 id="bendra-pav">Bendras vaizdas</h2>
+    <p class="bendra-skaiciai">
+      {% for k in ["gereja", "stabilu", "prasteja"] %}
+      <span class="bendra-sk bendra-sk-{{ k }}"><b>{{ bendra[k] }}</b> <span><span aria-hidden="true">{{ busenos[k].ikona }}</span> {{ busenos[k].zodis|lower }}</span></span>
+      {% endfor %}
+      <span class="bendra-is">iš {{ vertinti }} vertinamų rodiklių{% if bendra.info %} (+{{ bendra.info }} stebimas){% endif %}</span>
+    </p>
+    <div class="juosta" role="img" aria-label="Gerėja {{ bendra.gereja }}, stabilu {{ bendra.stabilu }}, prastėja {{ bendra.prasteja }}">
+      {% for k in ["gereja", "stabilu", "prasteja"] if bendra[k] %}<span class="juosta-{{ k }}" style="flex: {{ bendra[k] }}"></span>{% endfor %}
+    </div>
+  </div>
+
+  <div class="matrica">
+    {% for s in sritys %}
+    <div class="matrica-eil">
+      <a class="matrica-sritis" href="#sritis-{{ s.nr }}"><span class="matrica-nr">{{ s.nr }}</span> {{ s.pavadinimas }}</a>
+      <ul class="matrica-rodikliai">
+        {% for r in s.rodikliai %}
+        <li><a class="mini mini-{{ r.busena }}" href="rodikliai/{{ r.id }}.html" title="{{ busenos[r.busena].zodis }}: {{ r.reiksme|sk(r.zenklas, r.dec) }}{{ r.vienetai }} ({{ r.laikotarpis|laikotarpis }})">
+          <span class="mini-ikona" aria-hidden="true">{{ busenos[r.busena].ikona }}</span>
+          <span class="mini-pav">{{ r.pavadinimas }}</span>
+          <span class="sr-only">– {{ busenos[r.busena].zodis }}</span>
+        </a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
   <ul class="legenda" aria-label="Būsenų reikšmės">
-    {% for k in ["gereja", "stabilu", "prasteja", "nera"] %}
+    {% for k in ["gereja", "stabilu", "prasteja", "info"] %}
     <li><span class="zyme zyme-{{ k }}"><span aria-hidden="true">{{ busenos[k].ikona }}</span> {{ busenos[k].zodis }}</span></li>
     {% endfor %}
+    <li class="legenda-pastaba">„Stebimas“ – rodiklis rodomas, bet nevertinamas, nes jo kryptis savaime nėra nei gera, nei bloga.</li>
   </ul>
 </section>
+
+<nav class="sriciu-nav" aria-label="Sritys">
+  <div class="sriciu-nav-vidus">
+  {% for s in sritys %}<a href="#sritis-{{ s.nr }}">{{ s.nr }}. {{ s.trumpai }}</a>{% endfor %}
+  <a class="i-virsu" href="#bendra-pav">↑ Suvestinė</a>
+  </div>
+</nav>
 
 {% for s in sritys %}
 <section class="sritis{% if not s.rodikliai %} sritis-rengiama{% endif %}" id="sritis-{{ s.nr }}">
@@ -41,6 +85,7 @@
       {% if r.reiksme is not none %}
       <div class="kortele-skaicius">{{ r.reiksme|sk(r.zenklas, r.dec) }}<span class="vnt">{{ r.vienetai }}</span></div>
       <div class="kortele-aprasas">{{ r.trumpas_aprasas }} · {{ r.laikotarpis|laikotarpis }}</div>
+      {% if r.palyginimas and r.busena != "info" %}<div class="kortele-palyg">{{ busenos[r.busena].zodis }}, {{ r.palyginimas }}</div>{% endif %}
       {{ r.spark|safe }}
       {% else %}
       <div class="kortele-tuscia">{{ r.trumpas_aprasas|capitalize }}</div>

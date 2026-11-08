@@ -13,29 +13,29 @@ from jinja2 import Environment, FileSystemLoader
 
 from rodikliai import (imigracija, migracijos_valdymas, senejimas, grizimas, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
                        sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
-from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis
+from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis, palyginimo_tekstas
 
 SAKNIS = Path(__file__).resolve().parent
 ISVESTIS = SAKNIS / "_site"
 
 # Sritys ir jų rodikliai. Kol srities rodikliai neparuošti, rodikliai = [].
 SRITYS = [
-    {"nr": 1, "pavadinimas": "Gyvenimo lygis ir sąlygos",
+    {"nr": 1, "trumpai": "Gyvenimo lygis", "pavadinimas": "Gyvenimo lygis ir sąlygos",
      "klausimas": "Ar žmonių materialinė gerovė gerėja?",
      "rodikliai": [realusis_du, busto_ispirkamumas, energijos_kainos]},
-    {"nr": 2, "pavadinimas": "Viešosios paslaugos",
+    {"nr": 2, "trumpai": "Paslaugos", "pavadinimas": "Viešosios paslaugos",
      "klausimas": "Ar piliečiai gauna geresnes viešąsias paslaugas?",
      "rodikliai": [sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai, brandos_egzaminai, issilavinimas]},
-    {"nr": 3, "pavadinimas": "Ekonomika ir užimtumas",
+    {"nr": 3, "trumpai": "Ekonomika", "pavadinimas": "Ekonomika ir užimtumas",
      "klausimas": "Ar ekonomika kuria gerovę ir darbo vietas?",
      "rodikliai": [bvp, nedarbas, nasumas, infliacija, skola]},
-    {"nr": 4, "pavadinimas": "Infrastruktūra ir aplinka",
+    {"nr": 4, "trumpai": "Infrastruktūra", "pavadinimas": "Infrastruktūra ir aplinka",
      "klausimas": "Ar šalis gerina savo fizinę ir aplinkos infrastruktūrą?",
      "rodikliai": [zuvusieji_keliuose, sesd_emisijos, atlieku_perdirbimas]},
-    {"nr": 5, "pavadinimas": "Saugumas ir visuomenės valdymas",
+    {"nr": 5, "trumpai": "Saugumas", "pavadinimas": "Saugumas ir visuomenės valdymas",
      "klausimas": "Ar valstybė užtikrina saugumą ir veiksmingai valdo svarbiausius visuomenės iššūkius?",
      "rodikliai": [nusikalstamumas, migracijos_valdymas, gynybos_islaidos]},
-    {"nr": 6, "pavadinimas": "Demografija ir migracija",
+    {"nr": 6, "trumpai": "Demografija", "pavadinimas": "Demografija ir migracija",
      "klausimas": "Ar šalies demografinė raida išlieka tvari ir ar valstybė geba valdyti gyventojų senėjimo bei migracijos iššūkius?",
      "rodikliai": [gyventojai, senejimas, grizimas, imigracija]},
 ]
@@ -69,6 +69,8 @@ def main():
         for modulis in sritis["rodikliai"]:
             print(f"• {modulis.__name__}")
             r = modulis.rodiklis()
+            if r.palyginimas is None:
+                r.palyginimas = palyginimo_tekstas(r.laikotarpis)
             r.spark = sparkline_svg(r.sparkline, nuo_nulio=r.spark_nuo_nulio) if r.sparkline is not None else ""
             r.grafiku_html = [f.to_html(full_html=False, include_plotlyjs=False,
                                         config={"displaylogo": False, "responsive": True,
@@ -80,12 +82,21 @@ def main():
         suvestine = {k: sum(r.busena == k for r in rodikliai) for k in BUSENOS}
         sritys.append({**sritis, "rodikliai": rodikliai, "suvestine": suvestine})
 
+    visi = [(s, r) for s in sritys for r in s["rodikliai"]]
+    bendra = {k: sum(r.busena == k for _, r in visi) for k in BUSENOS}
+    vertinti = sum(bendra[k] for k in ("gereja", "stabilu", "prasteja"))
+
     (ISVESTIS / "index.html").write_text(
-        env.get_template("index.html").render(sritys=sritys, **bendri), encoding="utf-8")
-    for sritis in sritys:
-        for r in sritis["rodikliai"]:
-            (ISVESTIS / "rodikliai" / f"{r.id}.html").write_text(
-                env.get_template("rodiklis.html").render(r=r, sritis=sritis, **bendri), encoding="utf-8")
+        env.get_template("index.html").render(sritys=sritys, bendra=bendra, vertinti=vertinti,
+                                              is_viso=len(visi), **bendri), encoding="utf-8")
+    (ISVESTIS / "metodika.html").write_text(
+        env.get_template("metodika.html").render(sritys=sritys, **bendri), encoding="utf-8")
+    for i, (sritis, r) in enumerate(visi):
+        ankstesnis = visi[i - 1][1] if i > 0 else None
+        kitas = visi[i + 1][1] if i + 1 < len(visi) else None
+        (ISVESTIS / "rodikliai" / f"{r.id}.html").write_text(
+            env.get_template("rodiklis.html").render(r=r, sritis=sritis, ankstesnis=ankstesnis, kitas=kitas,
+                                                     sritys=sritys, **bendri), encoding="utf-8")
     (ISVESTIS / ".nojekyll").touch()   # GitHub Pages: neapdoroti per Jekyll
     print(f"✅ Svetainė sugeneruota: {ISVESTIS}")
 

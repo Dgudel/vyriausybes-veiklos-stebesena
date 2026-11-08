@@ -19,6 +19,8 @@ SRIFTAS = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"
 
 MENESIAI_KADA = ["sausį", "vasarį", "kovą", "balandį", "gegužę", "birželį", "liepą",
                  "rugpjūtį", "rugsėjį", "spalį", "lapkritį", "gruodį"]
+MENESIAI_SU = ["sausiu", "vasariu", "kovu", "balandžiu", "gegužiu", "birželiu", "liepa",
+               "rugpjūčiu", "rugsėju", "spaliu", "lapkričiu", "gruodžiu"]
 MENESIAI = ["sausis", "vasaris", "kovas", "balandis", "gegužė", "birželis", "liepa",
             "rugpjūtis", "rugsėjis", "spalis", "lapkritis", "gruodis"]
 
@@ -45,6 +47,7 @@ class Rodiklis:
     zenklas: bool = True                 # rodyti +/− (pokyčiams); False – lygio reikšmėms
     dec: int = 1                         # skaitmenų po kablelio
     spark_nuo_nulio: bool = True         # ar mažame grafike rodyti nulį (pokyčiams – taip)
+    palyginimas: str | None = None       # palyginimo pagrindas; jei None – nustatomas automatiškai pagal laikotarpį
 
 
 # ---------------- Duomenys ----------------
@@ -223,3 +226,18 @@ def sparkline_svg(s: pd.Series, plotis: int = 140, aukstis: int = 40, nuo_nulio:
             f'{linija}'
             f'<polyline points="{tasku}" class="spark-linija"/>'
             f'<circle cx="{xs[-1]:.1f}" cy="{ys[-1]:.1f}" r="3" class="spark-taskas"/></svg>')
+
+
+def palyginimo_tekstas(laikotarpis: str) -> str:
+    """Iš rodiklio laikotarpio – su kuo lyginama: tas pats laikotarpis prieš metus."""
+    import re
+    if m := re.match(r"^(\d{4})M(\d{2})$", laikotarpis):
+        return f"lyginant su {int(m[1]) - 1} m. {MENESIAI_SU[int(m[2]) - 1]}"
+    if m := re.match(r"^(\d{4})K(\d)$", laikotarpis):
+        return f"lyginant su {int(m[1]) - 1} m. {m[2]} ketv."
+    if m := re.match(r"^(\d{4}) m\. sausis(?:–(\w+))?$", laikotarpis):
+        iki = f"–{MENESIAI_SU[MENESIAI.index(m[2])]}" if m[2] else ""
+        return f"lyginant su {int(m[1]) - 1} m. sausiu{iki}"
+    if m := re.match(r"^(\d{4})", laikotarpis):
+        return f"lyginant su {int(m[1]) - 1} m."
+    return ""

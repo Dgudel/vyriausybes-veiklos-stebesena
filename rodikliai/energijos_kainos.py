@@ -1,7 +1,7 @@
 """1.3 Energijos kainos ir pragyvenimo išlaidų spaudimas."""
 import plotly.graph_objects as go
 
-from .bendra import SERIJOS, Rodiklis, ivertink, linijos, sk, stilius, zmoniu_laikotarpis
+from .bendra import SERIJOS, Rodiklis, palyginimo_tekstas, ivertink, linijos, sk, stilius, zmoniu_laikotarpis
 from .saltiniai import du_serija, kainu_pokytis, laikotarpis_is_datos
 
 SLENKSTIS = 1.0     # ±1 proc. punktas tarp energijos kainų ir atlyginimų augimo – stabilu
@@ -41,6 +41,7 @@ def rodiklis() -> Rodiklis:
         pavadinimas="Energijos kainos",
         trumpas_aprasas="per metus",
         reiksme=pask, laikotarpis=laik, busena=busena,
+        palyginimas=f"vertinta pagal {bl}, {palyginimo_tekstas(laikotarpis_is_datos(bendras))}",
         vertinimo_taisykle=("Vertinama, ar energija brangsta greičiau nei auga neto atlyginimai. "
                             f"Gerėja, kai energijos kainos auga daugiau nei {sk(SLENKSTIS, False)} proc. punkto lėčiau už atlyginimus; "
                             f"prastėja, kai daugiau nei {sk(SLENKSTIS, False)} proc. punkto greičiau; kitu atveju – stabilu."),

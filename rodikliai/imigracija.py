@@ -59,9 +59,9 @@ def rodiklis() -> Rodiklis:
         trumpas_aprasas="atvykusių gyventi per metus",
         reiksme=pask / 1000, vienetai=" tūkst.", laikotarpis=str(metai), busena="info",
         zenklas=False, spark_nuo_nulio=True,
+        palyginimas="nevertinama",
         vertinimo_taisykle=("Informacinis rodiklis: imigracijos mastas savaime nevertinamas kaip gerėjimas ar "
-                            "prastėjimas, todėl būsena nenustatoma. Stebima, kiek ir kas atvyksta, bei prieglobsčio "
-                            "grynoji migracija."),
+                            "prastėjimas, todėl būsena nenustatoma. Stebima, kiek ir kas atvyksta, ir grynoji migracija."),
         vertinimo_paaiskinimas=(f"{metai} m. imigrantų skaičius – {_tukst(pask)} ({ankst} m. – "
                                 f"{_tukst(pries)}); imigracija {kryptis} {sk(abs(pokytis), False)} %. "
                                 f"Iš jų {_tukst(grizo)} – grįžtantys Lietuvos piliečiai ({sk(grizo / pask * 100, False, 0)} %). "
