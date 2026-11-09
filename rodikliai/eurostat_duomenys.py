@@ -95,7 +95,9 @@ def _atsisiusk(kodas: str):
         except Exception:
             df = _atsisiusk_tsv(kodas)      # 3) visa lentelė TSV formatu
     geo_col = next(c for c in df.columns if c.startswith("geo"))
-    df = df[df[geo_col].isin(SALYS)].rename(columns={geo_col: "geo"})
+    geos = filtrai.get("geo", SALYS)
+    geos = [geos] if isinstance(geos, str) else geos
+    df = df[df[geo_col].isin(geos)].rename(columns={geo_col: "geo"})
     q_col = next((c for c in df.columns if c.startswith("quant")), None)
     if q_col and q_col != "quantile":
         df = df.rename(columns={q_col: "quantile"})

@@ -5,6 +5,7 @@
 
 Peržiūra kompiuteryje:  python -m http.server -d _site 8000  ->  http://localhost:8000
 """
+import os
 import shutil
 from datetime import date
 from pathlib import Path
@@ -49,6 +50,32 @@ BUSENOS = {
 }
 
 
+def saugiai(modulis):
+    """Apskaičiuoja rodiklį. Jei nepavyksta su naujai atsisiųstais duomenimis – bando su saugyklos failais;
+    jei ir tai nepavyksta – rodiklis praleidžiamas, bet svetainė vis tiek sugeneruojama."""
+    try:
+        return modulis.rodiklis()
+    except Exception as e:
+        print(f"  ⚠ {modulis.__name__}: {type(e).__name__}: {e}")
+    if os.environ.get("ATNAUJINTI") == "1":
+        import subprocess
+        from rodikliai import eurostat_duomenys
+        subprocess.run(["git", "checkout", "--", "duomenys/"], cwd=SAKNIS, capture_output=True)
+        os.environ["ATNAUJINTI"] = "0"
+        eurostat_duomenys.lentele.cache_clear()
+        try:
+            r = modulis.rodiklis()
+            print(f"  ↺ {modulis.__name__}: naudoti saugyklos duomenys")
+            return r
+        except Exception as e:
+            print(f"  ⚠ {modulis.__name__} vis tiek nepavyko: {e}")
+        finally:
+            os.environ["ATNAUJINTI"] = "1"
+            eurostat_duomenys.lentele.cache_clear()
+    print(f"  ✗ {modulis.__name__} praleistas")
+    return None
+
+
 def main():
     if ISVESTIS.exists():
         shutil.rmtree(ISVESTIS)
@@ -70,7 +97,9 @@ def main():
         rodikliai = []
         for modulis in sritis["rodikliai"]:
             print(f"• {modulis.__name__}")
-            r = modulis.rodiklis()
+            r = saugiai(modulis)
+            if r is None:
+                continue
             if r.palyginimas is None:
                 r.palyginimas = palyginimo_tekstas(r.laikotarpis)
             r.spark = sparkline_svg(r.sparkline, nuo_nulio=r.spark_nuo_nulio) if r.sparkline is not None else ""
