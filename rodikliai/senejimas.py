@@ -1,7 +1,7 @@
 """6. Visuomenės senėjimas: senatvės priklausomybės koeficientas (65+ / 15–64)."""
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 0.5     # punkto
@@ -39,11 +39,7 @@ def rodiklis() -> Rodiklis:
     lentele.insert(0, "metai", lentele.index.year)
 
     kryptis = "padidėjo" if pokytis > 0 else "sumažėjo"
-
-    _dalys = [dalis("65 m. ir vyresnių dalis", seni, "mazesne", 0.3),
-              dalis("Vaikų (0–14 m.) dalis", vaikai, "didesne", 0.3)]
     return Rodiklis(
-        dalys=_dalys,
         id="senejimas",
         pavadinimas="Visuomenės senėjimas",
         trumpas_aprasas="65+ m. žmonių 100-ui darbingo amžiaus",

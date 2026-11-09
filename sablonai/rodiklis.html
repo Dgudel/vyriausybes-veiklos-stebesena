@@ -18,40 +18,10 @@
   <div class="vertinimas vertinimas-{{ r.busena }}">
     <span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span>
     {% if r.vertinimo_paaiskinimas %}<p>{{ r.vertinimo_paaiskinimas }}</p>{% endif %}
-    {% if r.palyginimas and r.busena != "info" %}<p class="taisykle"><b>Palyginimo pagrindas:</b> {{ r.palyginimas }}{% if not r.palyginimas.endswith('.') %}.{% endif %}</p>{% endif %}
+    {% if r.palyginimas and r.busena != "info" %}<p class="taisykle"><b>Palyginimo pagrindas:</b> {{ r.palyginimas }}.</p>{% endif %}
     <p class="taisykle"><b>Kaip vertinama.</b> {{ r.vertinimo_taisykle }} <a href="../metodika.html">Visos taisyklės</a></p>
   </div>
 </section>
-
-{% if r.dalys %}
-<section class="visi-vertinimai" aria-labelledby="vv-pav">
-  <h2 id="vv-pav">Visi šio rodiklio vertinimai</h2>
-  <div class="lentele-wrap">
-  <table class="vv-lentele">
-    <thead><tr><th>Matas</th><th>Reikšmė</th><th>Pokytis</th><th>Palyginimas</th><th>Būsena</th></tr></thead>
-    <tbody>
-      <tr class="vv-pagr">
-        <td>{{ r.pavadinimas }} <span class="vv-zyma">pagrindinis</span></td>
-        <td>{{ r.reiksme|sk(r.zenklas, r.dec) }}{{ ' ' if r.vienetai == '%' }}{{ r.vienetai }} <span class="vv-laik">{{ r.laikotarpis|laikotarpis }}</span></td>
-        <td>–</td>
-        <td>{{ r.palyginimas or "–" }}</td>
-        <td><span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span></td>
-      </tr>
-      {% for x in r.dalys %}
-      <tr>
-        <td>{{ x.pavadinimas }}</td>
-        <td>{{ x.reiksme|sk(x.zenklas, x.dec) }}{{ ' ' if x.vienetai == '%' }}{{ x.vienetai }} <span class="vv-laik">{{ x.laikotarpis|laikotarpis }}</span></td>
-        <td>{{ x.pokytis or "–" }}</td>
-        <td>{{ x.palyginimas or "–" }}</td>
-        <td><span class="zyme zyme-{{ x.busena }}" title="{{ x.taisykle }}"><span aria-hidden="true">{{ busenos[x.busena].ikona }}</span> {{ busenos[x.busena].zodis }}</span></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  <p class="vv-pastaba">Kiekviena dalis vertinama ta pačia logika – lyginant su tuo pačiu laikotarpiu prieš metus. Taisyklės – <a href="../metodika.html#{{ r.id }}">metodikoje</a>. Visi šie vertinimai įskaičiuojami į bendrą suvestinę.</p>
-</section>
-{% endif %}
 
 {% if r.papildomai %}
 <section class="papildomai">

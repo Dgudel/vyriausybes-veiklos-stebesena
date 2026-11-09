@@ -2,7 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, ivertink, sk, stilius
+from .bendra import SERIJOS, Rodiklis, ivertink, sk, stilius
 from .eurostat_duomenys import PERIODAS, _data, lentele, serija
 
 SLENKSTIS = 2.0     # proc. punkto
@@ -51,9 +51,9 @@ def rodiklis() -> Rodiklis:
     bendra = dict(citizen="TOTAL", age="TOTAL", sex="T", unit="PER")
     isakyta = serija("migr_eiord", "LT", **bendra)
     issiusta = serija("migr_eirtn", "LT", c_dest="TOTAL", **bendra)
-    santykis = (issiusta / isakyta * 100).dropna()
-    pask, pries = santykis.iloc[-1], santykis.iloc[-2]
-    metai, ankst = santykis.index[-1].year, santykis.index[-2].year
+    dalis = (issiusta / isakyta * 100).dropna()
+    pask, pries = dalis.iloc[-1], dalis.iloc[-2]
+    metai, ankst = dalis.index[-1].year, dalis.index[-2].year
     pokytis = pask - pries
     busena = ivertink(pokytis, "didesne", SLENKSTIS)
 
@@ -63,7 +63,7 @@ def rodiklis() -> Rodiklis:
         s = s[s.index >= nuo]
         f1.add_trace(go.Bar(x=s.index, y=s.values, name=vardas, marker_color=SERIJOS[i],
                             hovertemplate=f"{vardas}: %{{y:.0f}}<extra></extra>"))
-    d = santykis[santykis.index >= nuo]
+    d = dalis[dalis.index >= nuo]
     f1.add_trace(go.Scatter(x=d.index, y=d.values, name="Išsiųstųjų dalis, %", yaxis="y2", mode="lines+markers",
                             line=dict(color=SERIJOS[2], width=2), hovertemplate="Dalis: %{y:.0f} %<extra></extra>"))
     f1.update_layout(barmode="group")
@@ -95,7 +95,7 @@ def rodiklis() -> Rodiklis:
         f3.update_layout(showlegend=False)
         grafikai.insert(1, f3)
 
-    lentele_df = pd.DataFrame({"ipareigota_isvykti": isakyta, "issiusta": issiusta, "dalis_proc": santykis})
+    lentele_df = pd.DataFrame({"ipareigota_isvykti": isakyta, "issiusta": issiusta, "dalis_proc": dalis})
     if nustatyta is not None:
         lentele_df = lentele_df.join(nustatyta.rename("nustatyta_neteisetai_esanciu"), how="outer")
     lentele_df = lentele_df[lentele_df.index >= nuo]
@@ -103,13 +103,7 @@ def rodiklis() -> Rodiklis:
 
     men_pav = f"{pask_men.year}-{pask_men.month:02d}"
     kryptis = "padidėjo" if pokytis > 0 else "sumažėjo"
-
-    _dalys = [dalis("Prieglobsčio prašymai (pirmą kartą), per mėn.", prasymai, "mazesne", 0, budas="info", vienetai="", dec=0)]
-    if nustatyta is not None and not nustatyta.empty:
-        _dalys.append(dalis("Nustatyta neteisėtai esančių užsieniečių", nustatyta, "mazesne", 0, budas="info",
-                            vienetai="", dec=0))
     return Rodiklis(
-        dalys=_dalys,
         id="migracijos-valdymas",
         pavadinimas="Neteisėtos migracijos valdymas",
         trumpas_aprasas="įpareigotų išvykti išsiųsta dalis",
@@ -122,7 +116,7 @@ def rodiklis() -> Rodiklis:
                                 f"{sk(pries, False, 0)} %). Dalis {kryptis} {sk(abs(pokytis), False, 0)} p. p. "
                                 f"Pirmų prieglobsčio prašymų per 12 mėn. iki {men_pav} – {_tukst(p12)} "
                                 f"(ankstesniais 12 mėn. – {_tukst(p12_pries)})."),
-        sparkline=santykis[santykis.index >= nuo],
+        sparkline=dalis[dalis.index >= nuo],
         grafikai=grafikai,
         apibrezimas=("Faktiškai iš Lietuvos išsiųstų (grąžintų) ne ES piliečių skaičiaus ir per tuos pačius metus "
                      "įpareigotų išvykti asmenų skaičiaus santykis. ES šį santykį naudoja kaip grąžinimo "

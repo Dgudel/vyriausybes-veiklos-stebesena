@@ -31,32 +31,33 @@
     </svg>
     <div class="suv-legenda">
       <h3>Bendras vaizdas</h3>
-      <p class="suv-paaisk">{{ vertinti }} vertinimai: {{ pagrindiniai.gereja + pagrindiniai.stabilu + pagrindiniai.prasteja }} pagrindinių rodiklių ir {{ daliu_sk }} jų sudedamųjų dalių</p>
       {% for k in ["gereja", "stabilu", "prasteja"] %}
       <div class="suv-eil suv-{{ k }}"><span class="suv-ikona" aria-hidden="true">{{ busenos[k].ikona }}</span>
         <b>{{ bendra[k] }}</b> {{ busenos[k].zodis|lower }}</div>
       {% endfor %}
-      {% if bendra.info %}<div class="suv-eil suv-info"><span class="suv-ikona" aria-hidden="true">◆</span> <b>{{ bendra.info }}</b> stebimi, nevertinami</div>{% endif %}
+      {% if bendra.info %}<div class="suv-eil suv-info"><span class="suv-ikona" aria-hidden="true">◆</span> <b>{{ bendra.info }}</b> stebimas, nevertinamas</div>{% endif %}
       <a class="suv-metodika" href="metodika.html">Kaip vertinama →</a>
     </div>
   </div>
 
   <div class="suv-sritys">
     {% for s in sritys %}
-    {% set g = s.suvestine.gereja %}{% set st = s.suvestine.stabilu %}{% set pr = s.suvestine.prasteja %}
+    {% set g = s.rodikliai|selectattr("busena", "equalto", "gereja")|list|length %}
+    {% set st = s.rodikliai|selectattr("busena", "equalto", "stabilu")|list|length %}
+    {% set pr = s.rodikliai|selectattr("busena", "equalto", "prasteja")|list|length %}
     <a class="sr-kortele" href="#sritis-{{ s.nr }}">
       <span class="sr-galva"><span class="sr-nr">{{ s.nr }}</span><span class="sr-pav">{{ s.pavadinimas }}</span></span>
       <span class="segmentai" aria-hidden="true">
-        {% for r in s.rodikliai %}<span class="seg-grupe" title="{{ r.pavadinimas }}">{% for b in r.visos_busenos if b != "nera" %}<span class="seg seg-{{ b }}"></span>{% endfor %}</span>{% endfor %}
+        {% for r in s.rodikliai %}<span class="seg seg-{{ r.busena }}" title="{{ r.pavadinimas }}: {{ busenos[r.busena].zodis }}"></span>{% endfor %}
       </span>
       <span class="sr-sarasas">
-        {% for r in s.rodikliai %}<span class="sr-rod"><i class="t-{{ r.busena }}" aria-hidden="true"></i><span class="sr-rod-pav">{{ r.pavadinimas }}{% if r.dalys %} <span class="sr-dalys" aria-hidden="true">{% for x in r.dalys if x.busena != "nera" %}<b class="t-{{ x.busena }}"></b>{% endfor %}</span>{% endif %}</span><span class="sr-only"> – {{ busenos[r.busena].zodis }}</span></span>{% endfor %}
+        {% for r in s.rodikliai %}<span class="sr-rod"><i class="t-{{ r.busena }}" aria-hidden="true"></i>{{ r.pavadinimas }}<span class="sr-only"> – {{ busenos[r.busena].zodis }}</span></span>{% endfor %}
       </span>
       <span class="sr-skaiciai">
         {% if g %}<span class="c-gereja">▲ {{ g }}</span>{% endif %}
         {% if st %}<span class="c-stabilu">■ {{ st }}</span>{% endif %}
         {% if pr %}<span class="c-prasteja">▼ {{ pr }}</span>{% endif %}
-        <span class="sr-is">{{ s.rodikliai|length }} rodikl. · {{ g + st + pr }} vertinimų</span>
+        <span class="sr-is">iš {{ s.rodikliai|length }} rodiklių</span>
       </span>
       <span class="sr-only">Gerėja {{ g }}, stabilu {{ st }}, prastėja {{ pr }}.</span>
     </a>
@@ -93,14 +94,6 @@
       <div class="kortele-skaicius">{{ r.reiksme|sk(r.zenklas, r.dec) }}<span class="vnt">{{ r.vienetai }}</span></div>
       <div class="kortele-aprasas">{{ r.trumpas_aprasas }} · {{ r.laikotarpis|laikotarpis }}</div>
       {% if r.palyginimas and r.busena != "info" %}<div class="kortele-palyg">{{ busenos[r.busena].zodis }}, {{ r.palyginimas }}</div>{% endif %}
-      {% if r.nesutampa %}
-      <ul class="kortele-dalys" aria-label="Kitaip vertinamos dalys">
-        {% for x in r.nesutampa[:2] %}
-        <li class="kd-{{ x.busena }}"><span aria-hidden="true">{{ busenos[x.busena].ikona }}</span> {{ x.pavadinimas }}: {{ busenos[x.busena].zodis|lower }}{% if x.pokytis %} ({{ x.pokytis }}){% endif %}</li>
-        {% endfor %}
-        {% if r.nesutampa|length > 2 %}<li class="kd-daugiau">ir dar {{ r.nesutampa|length - 2 }} – žr. „Plačiau“</li>{% endif %}
-      </ul>
-      {% endif %}
       {{ r.spark|safe }}
       {% else %}
       <div class="kortele-tuscia">{{ r.trumpas_aprasas|capitalize }}</div>

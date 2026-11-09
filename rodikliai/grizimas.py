@@ -1,7 +1,7 @@
 """6. Emigracija ir grįžtamoji migracija: Lietuvos piliečių grynoji migracija."""
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, ivertink, sk, stilius
+from .bendra import SERIJOS, Rodiklis, ivertink, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 500     # žmonių per metus
@@ -42,11 +42,7 @@ def rodiklis() -> Rodiklis:
     lentele.insert(0, "metai", lentele.index.year)
 
     kryptis = "pagerėjo" if pokytis > 0 else "pablogėjo"
-
-    _dalys = [dalis("Grįžo Lietuvos piliečių", grizo, "didesne", 3.0, budas="proc", vienetai="", dec=0),
-              dalis("Išvyko Lietuvos piliečių", isvyko, "mazesne", 3.0, budas="proc", vienetai="", dec=0)]
     return Rodiklis(
-        dalys=_dalys,
         id="emigracija-grizimas",
         pavadinimas="Emigracija ir grįžimas",
         trumpas_aprasas="Lietuvos piliečių grynoji migracija",

@@ -233,32 +233,3 @@ a { color: var(--akcentas); }
 .metodika-lentele td:nth-child(2) { width: 12%; }
 .metodika-lentele td:nth-child(3) { width: 22%; }
 .apacia a { color: inherit; }
-
-/* ---------- Sudedamosios dalys ---------- */
-.kortele-dalys { list-style: none; margin: 6px 0 0; padding: 0; font-size: 12.5px; display: grid; gap: 2px; }
-.kortele-dalys li { color: var(--tekstas-antr); }
-.kortele-dalys span { font-size: 10px; margin-right: 2px; }
-.kd-gereja span { color: var(--gereja); } .kd-stabilu span { color: var(--stabilu); } .kd-prasteja span { color: var(--prasteja); }
-.kd-daugiau { color: var(--tekstas-blankus) !important; }
-.suv-paaisk { margin: -4px 0 8px; font-size: 13px; color: var(--tekstas-blankus); }
-.seg-grupe { flex: var(--n, 1); display: flex; gap: 1px; }
-.segmentai { gap: 4px; }
-.seg-grupe .seg { flex: 1; border-radius: 2px; }
-.sr-dalys { display: inline-flex; gap: 2px; margin-left: 4px; vertical-align: 1px; }
-.sr-dalys b { width: 6px; height: 6px; border-radius: 50%; display: inline-block; opacity: .85; }
-.visi-vertinimai { margin-top: 28px; }
-.visi-vertinimai h2 { font-size: 18px; margin: 0 0 10px; }
-.vv-lentele { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 680px; }
-.vv-lentele th { text-align: left; font-size: 12.5px; color: var(--tekstas-blankus); font-weight: 600;
-  padding: 9px 12px; border-bottom: 1px solid var(--linija); }
-.vv-lentele td { padding: 9px 12px; border-bottom: 1px solid var(--linija); color: var(--tekstas-antr); vertical-align: middle; }
-.vv-lentele tr:last-child td { border-bottom: 0; }
-.vv-lentele td:first-child { color: var(--tekstas); font-weight: 600; }
-.vv-lentele td:nth-child(2), .vv-lentele td:nth-child(3) { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.vv-pagr td { background: #fafaf8; }
-.vv-zyma { font-size: 11px; font-weight: 600; color: var(--tekstas-blankus); border: 1px solid var(--linija);
-  border-radius: 999px; padding: 1px 7px; margin-left: 6px; }
-.vv-laik { display: block; font-size: 12px; color: var(--tekstas-blankus); }
-.vv-pastaba { font-size: 13px; color: var(--tekstas-blankus); margin: 8px 0 0; }
-.met-dalis td { font-size: 13.5px; background: #fbfbfa; }
-.met-dalis td:first-child { font-weight: 400 !important; padding-left: 22px; }

@@ -16,10 +16,6 @@
         atlyginimų – augimas).</li>
     <li><b>Slenkstis.</b> Pokytis, mažesnis už rodikliui nustatytą slenkstį, laikomas <b>stabiliu</b> – taip
         atsitiktiniai svyravimai ir apklausų paklaida nerodomi kaip gerėjimas ar prastėjimas.</li>
-    <li><b>Sudedamosios dalys.</b> Jei rodiklio puslapyje grafikuose rodomi ir kiti Lietuvos matai (pvz., sukčiavimas
-        šalia nusikalstamumo be sukčiavimo, lietuvių kalba šalia matematikos), kiekvienas jų vertinamas atskirai ta pačia
-        logika ir įskaičiuojamas į bendrą suvestinę. Palyginimai su ES ar NATO vidurkiais ir vieno skaičiaus
-        išskaidymai (pvz., pagal kelio tipą) nevertinami.</li>
     <li><b>Išimtys.</b> Keli rodikliai patys yra metiniai pokyčiai (pvz., realusis darbo užmokestis, BVP augimas) arba
         palyginimai (būsto ir energijos kainos – su atlyginimų augimu), todėl vertinamas jų dydis. Gyventojų kaita
         vertinama pagal tai, ar gyventojų daugėja, ar mažėja. Imigracija rodoma be vertinimo (◆ Stebimas).</li>
@@ -34,20 +30,12 @@
     <thead><tr><th>Rodiklis</th><th>Dabartinė būsena</th><th>Palyginimo pagrindas</th><th>Taisyklė</th></tr></thead>
     <tbody>
     {% for r in s.rodikliai %}
-    <tr id="{{ r.id }}">
+    <tr>
       <td><a href="rodikliai/{{ r.id }}.html">{{ r.pavadinimas }}</a></td>
       <td><span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span></td>
       <td>{{ r.palyginimas|capitalize if r.palyginimas else "–" }}</td>
       <td>{{ r.vertinimo_taisykle }}</td>
     </tr>
-    {% for x in r.dalys %}
-    <tr class="met-dalis">
-      <td>↳ {{ x.pavadinimas }}</td>
-      <td><span class="zyme zyme-{{ x.busena }}"><span aria-hidden="true">{{ busenos[x.busena].ikona }}</span> {{ busenos[x.busena].zodis }}</span></td>
-      <td>{{ x.palyginimas|capitalize if x.palyginimas else "–" }}</td>
-      <td>{{ x.taisykle }}</td>
-    </tr>
-    {% endfor %}
     {% endfor %}
     </tbody>
   </table>

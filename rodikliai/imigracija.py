@@ -2,7 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, linijos, sk, stilius
+from .bendra import SERIJOS, Rodiklis, linijos, sk, stilius
 from .eurostat_duomenys import lentele, serija, PERIODAS, _data
 
 
@@ -53,10 +53,7 @@ def rodiklis() -> Rodiklis:
     lentele_df.insert(0, "metai", lentele_df.index.year)
 
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
-
-    _dalys = [dalis("Grynoji tarptautinė migracija", neto, "didesne", 0, budas="info", vienetai="", dec=0, zenklas=True)]
     return Rodiklis(
-        dalys=_dalys,
         id="imigracija",
         pavadinimas="Imigracija",
         trumpas_aprasas="atvykusių gyventi per metus",

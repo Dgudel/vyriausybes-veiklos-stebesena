@@ -1,7 +1,7 @@
 """6. Demografija: gyventojų skaičiaus kaita (natūrali kaita + migracija)."""
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 1.0     # ‰ – gyventojų skaičiaus pokytis per metus
@@ -42,11 +42,7 @@ def rodiklis() -> Rodiklis:
     lentele.insert(0, "metai", lentele.index.year)
 
     poz = lambda v: "augo" if v > 0 else "mažėjo"
-
-    _dalys = [dalis("Natūrali kaita (gimę minus mirę)", natur, "didesne", 0.5, vienetai=" ‰", slenkscio_vnt=" ‰", zenklas=True),
-              dalis("Neto migracija", migr, "didesne", 0, budas="info", vienetai=" ‰", zenklas=True)]
     return Rodiklis(
-        dalys=_dalys,
         id="gyventoju-kaita",
         pavadinimas="Gyventojų skaičiaus kaita",
         trumpas_aprasas="1000 gyventojų per metus",
