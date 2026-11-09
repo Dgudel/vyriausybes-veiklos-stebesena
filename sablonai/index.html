@@ -52,18 +52,23 @@
         {% for r in s.rodikliai %}<span class="seg-grupe" title="{{ r.pavadinimas }}">{% for b in r.visos_busenos if b != "nera" %}<span class="seg seg-{{ b }}"></span>{% endfor %}</span>{% endfor %}
       </span>
       <span class="sr-sarasas">
-        {% for r in s.rodikliai %}<span class="sr-rod"><i class="t-{{ r.busena }}" aria-hidden="true"></i><span class="sr-rod-pav">{{ r.pavadinimas }}{% if r.dalys %} <span class="sr-dalys" aria-hidden="true">{% for x in r.dalys if x.busena != "nera" %}<b class="t-{{ x.busena }}"></b>{% endfor %}</span>{% endif %}</span><span class="sr-only"> – {{ busenos[r.busena].zodis }}</span></span>{% endfor %}
+        {% for r in s.pagrindines %}{% set kitos_r = s.kitos|selectattr("tevas", "sameas", r)|list if r.tevas is not defined else [] %}<span class="sr-rod"><i class="t-{{ r.busena }}" aria-hidden="true"></i><span class="sr-rod-pav">{{ r.pavadinimas }}{% if kitos_r %} <span class="sr-dalys" title="Sudedamųjų dalių būsenos" aria-hidden="true">{% for x in kitos_r %}<b class="t-{{ x.busena }}"></b>{% endfor %}</span>{% endif %}</span><span class="sr-only"> – {{ busenos[r.busena].zodis }}</span></span>{% endfor %}
       </span>
       <span class="sr-skaiciai">
         {% if g %}<span class="c-gereja">▲ {{ g }}</span>{% endif %}
         {% if st %}<span class="c-stabilu">■ {{ st }}</span>{% endif %}
         {% if pr %}<span class="c-prasteja">▼ {{ pr }}</span>{% endif %}
-        <span class="sr-is">{{ s.rodikliai|length }} rodikl. · {{ g + st + pr }} vertinimų</span>
+        <span class="sr-is">{{ s.pagrindines|length }} pagr. + {{ s.kitos|length }} kiti</span>
       </span>
       <span class="sr-only">Gerėja {{ g }}, stabilu {{ st }}, prastėja {{ pr }}.</span>
     </a>
     {% endfor %}
   </div>
+  <p class="suv-taskai-legenda">
+    <span><i class="t-gereja"></i><i class="t-stabilu"></i><i class="t-prasteja"></i> kvadratėlis – rodiklio būsena</span>
+    <span><b class="t-gereja"></b><b class="t-stabilu"></b><b class="t-prasteja"></b> taškeliai – jo sudedamųjų dalių (skiltis „Kiti rodikliai“) būsenos</span>
+    <span>juosta ir skaičiai – visi srities vertinimai</span>
+  </p>
 </section>
 
 {% for s in sritys %}

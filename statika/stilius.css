@@ -294,3 +294,10 @@ a { color: var(--akcentas); }
 .metodika-di ul { color: var(--tekstas-antr); padding-left: 20px; }
 .metodika-di li { margin-bottom: 8px; }
 @media (max-width: 760px) { .apacia-tinklelis { grid-template-columns: 1fr; gap: 8px; } }
+
+.suv-taskai-legenda { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 2px 0 0;
+  font-size: 13px; color: var(--tekstas-blankus); }
+.suv-taskai-legenda span { display: inline-flex; align-items: center; gap: 3px; }
+.suv-taskai-legenda i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.suv-taskai-legenda b { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.suv-taskai-legenda span > :last-of-type { margin-right: 4px; }

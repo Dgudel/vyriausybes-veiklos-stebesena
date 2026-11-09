@@ -31,7 +31,7 @@ ISKELTI = {
         ("nusikalstamumas", "Tyčiniai nužudymai", "Tyčiniai nužudymai", "100 tūkst. gyventojų"),
         ("migracijos-valdymas", "Prieglobsčio prašymai", "Prieglobsčio prašymai", "pirmų prašymų per mėnesį")],
     6: [("gyventoju-kaita", "Suminis gimstamumo", "Gimstamumas", "vaikų vienai moteriai"),
-        ("emigracija-grizimas", "Išvyko", "Emigracija", "išvykusių Lietuvos piliečių per metus")],
+        ("emigracija-grizimas", "Išvyko", "Išvykę piliečiai", "išvykusių Lietuvos piliečių per metus")],
 }
 
 SRITYS = [
