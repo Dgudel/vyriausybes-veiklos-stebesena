@@ -11,7 +11,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from rodikliai import (skurdas, nelygybe, imigracija, migracijos_valdymas, senejimas, grizimas, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
+from rodikliai import (pasitenkinimas, savizudybes, regionai, atsinaujinanti_energija, oro_tarsa, skurdas, nelygybe, imigracija, migracijos_valdymas, senejimas, grizimas, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
                        sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
 from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis, palyginimo_tekstas
 
@@ -22,16 +22,16 @@ ISVESTIS = SAKNIS / "_site"
 SRITYS = [
     {"nr": 1, "trumpai": "Gyvenimo lygis", "pavadinimas": "Gyvenimo lygis ir sąlygos",
      "klausimas": "Ar žmonių materialinė gerovė gerėja?",
-     "rodikliai": [realusis_du, busto_ispirkamumas, energijos_kainos, skurdas, nelygybe]},
+     "rodikliai": [realusis_du, busto_ispirkamumas, energijos_kainos, skurdas, nelygybe, pasitenkinimas]},
     {"nr": 2, "trumpai": "Paslaugos", "pavadinimas": "Viešosios paslaugos",
      "klausimas": "Ar piliečiai gauna geresnes viešąsias paslaugas?",
-     "rodikliai": [sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai, brandos_egzaminai, issilavinimas]},
+     "rodikliai": [sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai, brandos_egzaminai, issilavinimas, savizudybes]},
     {"nr": 3, "trumpai": "Ekonomika", "pavadinimas": "Ekonomika ir užimtumas",
      "klausimas": "Ar ekonomika kuria gerovę ir darbo vietas?",
-     "rodikliai": [bvp, nedarbas, nasumas, infliacija, skola]},
+     "rodikliai": [bvp, nedarbas, nasumas, infliacija, skola, regionai]},
     {"nr": 4, "trumpai": "Infrastruktūra", "pavadinimas": "Infrastruktūra ir aplinka",
      "klausimas": "Ar šalis gerina savo fizinę ir aplinkos infrastruktūrą?",
-     "rodikliai": [zuvusieji_keliuose, sesd_emisijos, atlieku_perdirbimas]},
+     "rodikliai": [zuvusieji_keliuose, sesd_emisijos, atlieku_perdirbimas, atsinaujinanti_energija, oro_tarsa]},
     {"nr": 5, "trumpai": "Saugumas", "pavadinimas": "Saugumas ir visuomenės valdymas",
      "klausimas": "Ar valstybė užtikrina saugumą ir veiksmingai valdo svarbiausius visuomenės iššūkius?",
      "rodikliai": [nusikalstamumas, migracijos_valdymas, gynybos_islaidos]},

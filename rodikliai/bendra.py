@@ -320,3 +320,21 @@ def dalis(pavadinimas: str, s: pd.Series, kryptis: str, slenkstis: float, budas:
                     f"daugiau nei {sk(slenkstis, False)}{u}; kitu atveju – stabilu.")
     return Dalis(pavadinimas, v, vienetai, laik, ivertink(pok, kryptis, slenkstis), tekstas, palyg, taisykle,
                  zenklas, dec)
+
+
+def papildomas_grafikas(pavadinimas: str, paantraste: str, saltinis: str, serijos: list, vnt: str = "",
+                        dec: int = 1, nuo: str | None = None, nuo_nulio: bool = True, zenklas: bool = False):
+    """Paprastas linijinis grafikas sudedamosioms dalims: serijos = [(vardas, pd.Series), ...]."""
+    import plotly.graph_objects as go
+    f = go.Figure()
+    rinkinys = []
+    for i, (vardas, s) in enumerate(serijos):
+        s = s.dropna()
+        if nuo:
+            s = s[s.index >= nuo]
+        rinkinys.append((vardas, s, SERIJOS[i % len(SERIJOS)]))
+    linijos(f, rinkinys, vnt=vnt, zenklas=zenklas, dec=dec, zymekliai=True)
+    stilius(f, pavadinimas, paantraste, saltinis, vnt=vnt, nulio_linija=zenklas, metiniai=True)
+    if nuo_nulio:
+        f.update_yaxes(rangemode="tozero")
+    return f

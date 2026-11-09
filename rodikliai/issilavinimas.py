@@ -1,7 +1,7 @@
 """2.4 Švietimo rezultatai: anksti mokslus palikę jaunuoliai ir aukštasis išsilavinimas."""
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, papildomas_grafikas, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 0.5     # proc. punkto (LFS apklausa – mažesni pokyčiai gali būti atsitiktiniai)
@@ -48,7 +48,13 @@ def rodiklis() -> Rodiklis:
 
     _dalys = [dalis("Anksti mokslus palikę vaikinai", lt_v, "mazesne", SLENKSTIS),
               dalis("Aukštasis išsilavinimas (25–34 m.)", alt, "didesne", SLENKSTIS)]
-    return Rodiklis(
+    neet = serija("edat_lfse_20", "LT", sex="T", age="Y15-29", training="NO_FE_NO_NFE", wstatus="NEMP", unit="PC")
+    neet_es = serija("edat_lfse_20", "EU27_2020", sex="T", age="Y15-29", training="NO_FE_NO_NFE", wstatus="NEMP", unit="PC")
+    mok = serija("trng_lfse_01", "LT", sex="T", age="Y25-64", unit="PC")
+    mok_es = serija("trng_lfse_01", "EU27_2020", sex="T", age="Y25-64", unit="PC")
+    _dalys += [dalis("Nedirbantis ir nesimokantis jaunimas (NEET, 15–29 m.)", neet, "mazesne", SLENKSTIS),
+               dalis("Suaugusiųjų mokymasis (25–64 m., per 4 sav.)", mok, "didesne", SLENKSTIS)]
+    _r = Rodiklis(
         dalys=_dalys,
         id="anksti-mokslus-palike",
         pavadinimas="Anksti mokslus palikę jaunuoliai",
@@ -78,3 +84,10 @@ def rodiklis() -> Rodiklis:
                      f"vaikinai / merginos, {lt_v.index[-1].year} m.")],
         lentele=lentele,
     )
+    _r.grafikai.append(papildomas_grafikas(
+        "Nedirbantis ir nesimokantis jaunimas (NEET)", "15–29 m. jaunuoliai, kurie nedirba ir nesimoko, %",
+        "Šaltinis: Eurostat, edat_lfse_20", [("Lietuva", neet), ("ES-27", neet_es)], vnt=" %", nuo="2005-01-01"))
+    _r.grafikai.append(papildomas_grafikas(
+        "Suaugusiųjų mokymasis", "25–64 m. gyventojai, per paskutines 4 savaites dalyvavę mokymesi, %",
+        "Šaltinis: Eurostat, trng_lfse_01", [("Lietuva", mok), ("ES-27", mok_es)], vnt=" %", nuo="2005-01-01"))
+    return _r

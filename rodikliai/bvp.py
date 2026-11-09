@@ -1,5 +1,5 @@
 """3.1 Realus BVP augimas (Eurostat namq_10_gdp) ir BVP vienam gyventojui (nama_10_pc)."""
-from .bendra import dalis, Rodiklis, ivertink, sk, zmoniu_laikotarpis
+from .bendra import dalis, papildomas_grafikas, Rodiklis, ivertink, sk, zmoniu_laikotarpis
 from .ekonomika_bendra import grafikas
 from .eurostat_duomenys import laikotarpis, serija
 
@@ -33,7 +33,13 @@ def rodiklis() -> Rodiklis:
 
 
     _dalys = [dalis("BVP vienam gyventojui (PGS, ES = 100)", pc_lt, "didesne", 1.0, vienetai="", slenkscio_vnt=" punkto")]
-    return Rodiklis(
+    inv = serija("nama_10_gdp", "LT", na_item="P51G", unit="PC_GDP")
+    inv_es = serija("nama_10_gdp", "EU27_2020", na_item="P51G", unit="PC_GDP")
+    mtep = serija("rd_e_gerdtot", "LT", sectperf="TOTAL", unit="PC_GDP")
+    mtep_es = serija("rd_e_gerdtot", "EU27_2020", sectperf="TOTAL", unit="PC_GDP")
+    _dalys += [dalis("Investicijos (bendrasis pagrindinio kapitalo formavimas), % BVP", inv, "didesne", 0.5),
+               dalis("Išlaidos moksliniams tyrimams (MTEP), % BVP", mtep, "didesne", 0.05, dec=2)]
+    _r = Rodiklis(
         dalys=_dalys,
         id="bvp-augimas", pavadinimas="Realus BVP augimas",
         trumpas_aprasas="per metus", reiksme=pask, vienetai="%", laikotarpis=laik, busena=busena,
@@ -55,3 +61,10 @@ def rodiklis() -> Rodiklis:
                     (f"{sk(es.iloc[-1])} %", f"ES-27 realus BVP pokytis, {zmoniu_laikotarpis(laik)}")],
         lentele=lentele,
     )
+    _r.grafikai.append(papildomas_grafikas(
+        "Investicijos", "Bendrasis pagrindinio kapitalo formavimas, % BVP", "Šaltinis: Eurostat, nama_10_gdp",
+        [("Lietuva", inv), ("ES-27", inv_es)], vnt=" %", nuo="2005-01-01"))
+    _r.grafikai.append(papildomas_grafikas(
+        "Išlaidos moksliniams tyrimams ir eksperimentinei plėtrai", "% BVP (ES tikslas – 3 %)",
+        "Šaltinis: Eurostat, rd_e_gerdtot", [("Lietuva", mtep), ("ES-27", mtep_es)], vnt=" %", dec=2, nuo="2005-01-01"))
+    return _r

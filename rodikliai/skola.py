@@ -1,7 +1,7 @@
 """3.5 Valdžios sektoriaus skola (Eurostat gov_10q_ggdebt)."""
 import pandas as pd
 
-from .bendra import Rodiklis, ivertink, sk, zmoniu_laikotarpis
+from .bendra import dalis, papildomas_grafikas, Rodiklis, ivertink, sk, zmoniu_laikotarpis
 from .ekonomika_bendra import grafikas
 from .eurostat_duomenys import laikotarpis, serija
 
@@ -31,7 +31,13 @@ def rodiklis() -> Rodiklis:
     lentele.insert(0, "laikotarpis", [laikotarpis(d, "Q") for d in lentele.index])
 
     kryptis = "padidėjo" if pokytis > 0 else "sumažėjo"
-    return Rodiklis(
+    _dalys = []
+    _def_q = serija("gov_10q_ggnfa", "LT", na_item="B9", sector="S13", unit="PC_GDP", s_adj="NSA")
+    deficitas = _def_q.rolling(4).mean().dropna()          # paskutinių 4 ketvirčių vidurkis
+    _dalys.append(dalis("Valdžios sektoriaus balansas (4 ketv. vidurkis), % BVP", deficitas, "didesne", 0.3,
+                        zenklas=True))
+    _r = Rodiklis(
+        dalys=_dalys,
         id="valdzios-skola", pavadinimas="Valdžios sektoriaus skola",
         trumpas_aprasas="BVP", reiksme=pask, vienetai="%", laikotarpis=laik, busena=busena,
         zenklas=False, spark_nuo_nulio=True,
@@ -53,3 +59,8 @@ def rodiklis() -> Rodiklis:
         papildomai=[(f"{sk(mln.iloc[-1] / 1000, False)} mlrd. Eur", f"skolos suma, {zmoniu_laikotarpis(laik)}")],
         lentele=lentele,
     )
+    _r.grafikai.append(papildomas_grafikas(
+        "Valdžios sektoriaus balansas (deficitas / perteklius)",
+        "% BVP, paskutinių 4 ketvirčių vidurkis (Mastrichto riba – −3 %)", "Šaltinis: Eurostat, gov_10q_ggnfa",
+        [("Lietuva", deficitas)], vnt=" %", nuo="2010-01-01", nuo_nulio=False, zenklas=True))
+    return _r

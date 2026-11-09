@@ -11,6 +11,7 @@ generuoti.py              # surenka rodiklius ir sugeneruoja svetainę į _site/
 rodikliai/
   bendra.py               # bendros priemonės: duomenų skaitymas, vertinimas, grafikų stilius
   saltiniai.py            # duomenų rinkiniai, naudojami kelių rodiklių
+  pasitenkinimas.py (1), savizudybes.py (2), regionai.py (3), atsinaujinanti_energija.py, oro_tarsa.py (4)
   skurdas.py, nelygybe.py   # 1 sritis (Eurostat EU-SILC: ilc_li02, ilc_li10, ilc_peps01n, ilc_mdsd11, ilc_di11, ilc_di12, tps00100, tps00098)
   realusis_du.py          # 1 rodiklis = 1 failas
   energijos_kainos.py

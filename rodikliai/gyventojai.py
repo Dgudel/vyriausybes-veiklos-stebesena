@@ -1,7 +1,7 @@
 """6. Demografija: gyventojų skaičiaus kaita (natūrali kaita + migracija)."""
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, papildomas_grafikas, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 1.0     # ‰ – gyventojų skaičiaus pokytis per metus
@@ -45,7 +45,11 @@ def rodiklis() -> Rodiklis:
 
     _dalys = [dalis("Natūrali kaita (gimę minus mirę)", natur, "didesne", 0.5, vienetai=" ‰", slenkscio_vnt=" ‰", zenklas=True),
               dalis("Neto migracija", migr, "didesne", 0, budas="info", vienetai=" ‰", zenklas=True)]
-    return Rodiklis(
+    gimstamumas = serija("demo_frate", "LT", unit="NR", age="TOTAL", agedef="COMPLET")
+    gimstamumas_es = serija("demo_frate", "EU27_2020", unit="NR", age="TOTAL", agedef="COMPLET")
+    _dalys.append(dalis("Suminis gimstamumo rodiklis (vaikų vienai moteriai)", gimstamumas, "didesne", 0.03,
+                        vienetai="", slenkscio_vnt="", dec=2))
+    _r = Rodiklis(
         dalys=_dalys,
         id="gyventoju-kaita",
         pavadinimas="Gyventojų skaičiaus kaita",
@@ -72,3 +76,8 @@ def rodiklis() -> Rodiklis:
                     (f"{sk(natur.iloc[-1])} ‰", f"natūrali kaita, {metai} m.")],
         lentele=lentele,
     )
+    _r.grafikai.append(papildomas_grafikas(
+        "Suminis gimstamumo rodiklis", "Vaikų skaičius, tenkantis vienai moteriai (kartų kaitai reikia ~2,1)",
+        "Šaltinis: Eurostat, demo_frate", [("Lietuva", gimstamumas), ("ES-27", gimstamumas_es)], dec=2,
+        nuo="1990-01-01"))
+    return _r

@@ -2,7 +2,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .bendra import dalis, papildomas_grafikas, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
 from .eurostat_duomenys import serija
 
 SLENKSTIS = 0.5     # proc. punkto (EU-SILC apklausa – mažesni pokyčiai gali būti atsitiktiniai)
@@ -83,7 +83,10 @@ def rodiklis() -> Rodiklis:
               dalis("Socialinės apsaugos išlaidos, % BVP", bvp_lt, "didesne", 0, budas="info")]
 
     kryptis = "sumažėjo" if pokytis < 0 else "padidėjo"
-    return Rodiklis(
+    pensijos = serija("ilc_pnp3", "LT", sex="T", unit="PC")
+    pensijos_es = serija("ilc_pnp3", "EU27_2020", sex="T", unit="PC")
+    _dalys.append(dalis("Pensijų pakankamumas (pensijos / atlyginimai)", pensijos * 100, "didesne", 1.0))
+    _r = Rodiklis(
         dalys=_dalys,
         id="skurdas",
         pavadinimas="Skurdo rizikos lygis",
@@ -118,3 +121,7 @@ def rodiklis() -> Rodiklis:
                     (f"{sk(poveikis_lt.iloc[-1], False, 0)} %", "tiek skurdą sumažina išmokos")],
         lentele=lentele,
     )
+    _r.grafikai.append(papildomas_grafikas(
+        "Pensijų pakankamumas", "65–74 m. pensijų medianos ir 50–59 m. darbo pajamų medianos santykis, %",
+        "Šaltinis: Eurostat, ilc_pnp3", [("Lietuva", pensijos * 100), ("ES-27", pensijos_es * 100)], vnt=" %", dec=0))
+    return _r
