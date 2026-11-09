@@ -301,3 +301,7 @@ a { color: var(--akcentas); }
 .suv-taskai-legenda i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
 .suv-taskai-legenda b { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
 .suv-taskai-legenda span > :last-of-type { margin-right: 4px; }
+
+.apacia-logo { display: inline-block; margin-bottom: 10px; }
+.apacia-logo img { height: 48px; width: auto; display: block; }
+.apacia-kontaktai { font-style: normal; margin: 0 0 10px; line-height: 1.55; }

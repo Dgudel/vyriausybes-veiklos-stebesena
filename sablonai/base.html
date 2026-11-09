@@ -38,7 +38,13 @@
 <footer class="apacia">
   <div class="plotis apacia-tinklelis">
     <div class="apacia-kurejas">
+      {% if mru_logo %}<a href="https://www.mruni.eu/" class="apacia-logo"><img src="{{ kelias }}{{ mru_logo }}" alt="Mykolo Romerio universitetas" height="48"></a>{% endif %}
       <p class="apacia-pav">Švieslentės kūrėjas – <b>Mykolo Romerio universitetas</b></p>
+      <address class="apacia-kontaktai">
+        Ateities g. 20, LT-08303 Vilnius<br>
+        Juridinio asmens kodas 111951726<br>
+        Tel. <a href="tel:+37061027509">+370 610 27509</a>
+      </address>
       <p>© {{ metai }} Mykolo Romerio universitetas. Visos teisės saugomos.
          Statistiniai duomenys priklauso jų teikėjams ir naudojami pagal jų pakartotinio naudojimo sąlygas.</p>
     </div>

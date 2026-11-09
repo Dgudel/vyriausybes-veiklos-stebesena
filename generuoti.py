@@ -114,7 +114,9 @@ def main():
     import hashlib
     css_versija = hashlib.md5((SAKNIS / "statika" / "stilius.css").read_bytes()).hexdigest()[:8]
     bendri = {"busenos": BUSENOS, "atnaujinta": date.today().strftime("%Y-%m-%d"), "css_versija": css_versija, "metai": date.today().year,
-              "plotlyjs_versija": get_plotlyjs_version()}
+              "plotlyjs_versija": get_plotlyjs_version(),
+              # MRU logotipas: įdėkite statika/mru-logo.svg (arba .png) – bus rodomas apačioje
+              "mru_logo": next((f"statika/{f.name}" for f in sorted((SAKNIS / "statika").glob("mru-logo.*"))), None)}
 
     sritys = []
     for sritis in SRITYS:
