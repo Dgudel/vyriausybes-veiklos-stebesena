@@ -166,7 +166,7 @@ def main():
             r.nesutampa = [d for d in r.nesutampa if d not in iskeltos]
         sritis["pagrindines"] = list(sritis["rodikliai"]) + iskeltos
         sritis["kitos"] = [x for x in visos_dalys if x not in iskeltos]
-        for x in sritis["kitos"]:
+        for x in iskeltos + sritis["kitos"]:      # puslapiai – ir iškeltoms, ir likusioms dalims
             s = x.serija.dropna() if x.serija is not None else None
             if s is not None and len(s) > 1:
                 if len(s) > 40 and (s.index[-1] - s.index[0]).days > 365 * 15:
@@ -197,6 +197,15 @@ def main():
             env.get_template("rodiklis.html").render(r=r, sritis=sritis, ankstesnis=ankstesnis, kitas=kitas,
                                                      **bendri), encoding="utf-8")
     (ISVESTIS / ".nojekyll").touch()   # GitHub Pages: neapdoroti per Jekyll
+    # Patikra: visos vidinės nuorodos turi vesti į esamus puslapius
+    import re as _re
+    truksta = sorted({(f.relative_to(ISVESTIS).as_posix(), h) for f in ISVESTIS.rglob("*.html")
+                      for h in _re.findall(r'href="([^"#:]+\.html)', f.read_text(encoding="utf-8"))
+                      if not (f.parent / h).resolve().exists()})
+    if truksta:
+        for puslapis, nuoroda in truksta[:20]:
+            print(f"  ✗ neveikianti nuoroda: {puslapis} → {nuoroda}")
+        raise SystemExit(f"Rasta neveikiančių nuorodų: {len(truksta)}")
     print(f"✅ Svetainė sugeneruota: {ISVESTIS}")
 
 
