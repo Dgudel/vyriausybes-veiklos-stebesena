@@ -280,3 +280,17 @@ a { color: var(--akcentas); }
 .kortele-maza .kortele-aprasas { font-size: 13px; }
 .kortele-maza .zyme { font-size: 11px; padding: 2px 7px; }
 .dalis-tevas { margin: 16px 0 0; font-size: 14px; color: var(--tekstas-antr); }
+
+/* ---------- Poraštė: kūrėjas, teisės, DI ---------- */
+.apacia { border-top: 1px solid var(--linija); margin-top: 40px; }
+.apacia p { margin: 0 0 8px; line-height: 1.55; }
+.apacia-tinklelis { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 32px; }
+.apacia-pav { font-size: 15px; color: var(--tekstas); }
+.apacia-di { display: block; }
+.di-zyma { flex: none; font-size: 10px; font-weight: 700; letter-spacing: .04em; color: var(--tekstas-antr);
+  border: 1px solid var(--linija); border-radius: 4px; padding: 1px 5px; margin-right: 6px; background: var(--pavirsius); vertical-align: 1px; }
+.metodika-di { background: var(--pavirsius); border: 1px solid var(--linija); border-radius: var(--spindulys);
+  padding: 18px 22px; max-width: 900px; scroll-margin-top: 72px; }
+.metodika-di ul { color: var(--tekstas-antr); padding-left: 20px; }
+.metodika-di li { margin-bottom: 8px; }
+@media (max-width: 760px) { .apacia-tinklelis { grid-template-columns: 1fr; gap: 8px; } }

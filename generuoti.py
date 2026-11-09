@@ -113,7 +113,7 @@ def main():
     from plotly.offline import get_plotlyjs_version
     import hashlib
     css_versija = hashlib.md5((SAKNIS / "statika" / "stilius.css").read_bytes()).hexdigest()[:8]
-    bendri = {"busenos": BUSENOS, "atnaujinta": date.today().strftime("%Y-%m-%d"), "css_versija": css_versija,
+    bendri = {"busenos": BUSENOS, "atnaujinta": date.today().strftime("%Y-%m-%d"), "css_versija": css_versija, "metai": date.today().year,
               "plotlyjs_versija": get_plotlyjs_version()}
 
     sritys = []

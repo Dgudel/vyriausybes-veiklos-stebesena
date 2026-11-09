@@ -12,7 +12,6 @@
 <header class="virsus">
   <div class="plotis">
     <a class="logo" href="{{ kelias }}index.html">Vyriausybės veiklos stebėsena</a>
-    <span class="prototipas">Prototipas</span>
     <nav class="meniu" aria-label="Pagrindinis meniu">
       <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}index.html#suvestine">Suvestinė</a>
       <details class="meniu-sritys">
@@ -37,10 +36,22 @@
 {% block turinys %}{% endblock %}
 </main>
 <footer class="apacia">
-  <div class="plotis">
-    Duomenų šaltiniai: Valstybės duomenų agentūra (data.gov.lt), Eurostat, Europos Centrinis Bankas,
-    Nacionalinė švietimo agentūra, VRM Informatikos ir ryšių departamentas, NATO.
-    Duomenys tikrinami kasdien; puslapis atnaujintas {{ atnaujinta }}. <a href="{{ kelias }}metodika.html">Vertinimo metodika</a>.
+  <div class="plotis apacia-tinklelis">
+    <div class="apacia-kurejas">
+      <p class="apacia-pav">Švieslentės kūrėjas – <b>Mykolo Romerio universitetas</b></p>
+      <p>© {{ metai }} Mykolo Romerio universitetas. Visos teisės saugomos.
+         Statistiniai duomenys priklauso jų teikėjams ir naudojami pagal jų pakartotinio naudojimo sąlygas.</p>
+    </div>
+    <div>
+      <p>Duomenų šaltiniai: Valstybės duomenų agentūra (data.gov.lt), Eurostat, Europos Centrinis Bankas,
+         Nacionalinė švietimo agentūra, VRM Informatikos ir ryšių departamentas, NATO.
+         Duomenys tikrinami kasdien; puslapis atnaujintas {{ atnaujinta }}.
+         <a href="{{ kelias }}metodika.html">Vertinimo metodika</a>.</p>
+      <p class="apacia-di"><span class="di-zyma" aria-hidden="true">DI</span>
+         Kuriant švieslentę naudotas dirbtinis intelektas (Anthropic Claude Opus 5.5 Medium modelis).
+         Rodiklių reikšmės ir vertinimai apskaičiuojami automatiškai pagal skelbiamas taisykles, be DI.
+         <a href="{{ kelias }}metodika.html#di">Plačiau apie DI naudojimą</a>.</p>
+    </div>
   </div>
 </footer>
 <script>
