@@ -3,8 +3,10 @@
 {% block turinys %}
 <section class="ivadas">
   <h1>Ar Lietuvai sekasi geriau?</h1>
-  <p>Šešios politikos sritys, {{ is_viso }} reguliariai atnaujinami rodikliai. Kiekvienas rodiklis vertinamas pagal
-     iš anksto nustatytą taisyklę: <b>gerėja</b>, <b>stabilu</b> arba <b>prastėja</b>.
+  <p>Šešios politikos sritys ir {{ (pagr_sk + kitu_sk)|rodikliu }}, kurie atnaujinami automatiškai: kiekvienoje
+     srityje rodomi svarbiausi ({{ pagr_sk }} iš viso), o dar {{ kitu_sk }} – skiltyse „Kiti rodikliai“.
+     Rodikliai vertinami pagal iš anksto nustatytą taisyklę: <b>gerėja</b>, <b>stabilu</b> arba <b>prastėja</b>{% if bendra.info %}
+     (keli, kurių kryptis savaime nėra nei gera, nei bloga, tik stebimi){% endif %}.
      Paspaudę rodiklį pamatysite grafikus, apibrėžimą ir šaltinius.</p>
   <p class="metodas"><b>Kaip vertinama?</b> Naujausia reikšmė lyginama <b>su tuo pačiu laikotarpiu prieš metus</b>:
      mėnesiniai duomenys – su tuo pačiu praėjusių metų mėnesiu, ketvirtiniai – su tuo pačiu ketvirčiu, metiniai – su
@@ -31,7 +33,7 @@
     </svg>
     <div class="suv-legenda">
       <h3>Bendras vaizdas</h3>
-      <p class="suv-paaisk">{{ vertinti }} vertinimai: {{ pagrindiniai.gereja + pagrindiniai.stabilu + pagrindiniai.prasteja }} pagrindinių rodiklių ir {{ daliu_sk }} jų sudedamųjų dalių</p>
+      <p class="suv-paaisk">Vertinama {{ vertinti }} iš {{ pagr_sk + kitu_sk }} rodiklių, įskaitant „Kitus rodiklius“{% if bendra.info %}; {{ bendra.info }} tik stebimi{% endif %}</p>
       {% for k in ["gereja", "stabilu", "prasteja"] %}
       <div class="suv-eil suv-{{ k }}"><span class="suv-ikona" aria-hidden="true">{{ busenos[k].ikona }}</span>
         <b>{{ bendra[k] }}</b> {{ busenos[k].zodis|lower }}</div>

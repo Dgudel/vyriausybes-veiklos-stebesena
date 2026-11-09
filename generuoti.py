@@ -64,6 +64,15 @@ BUSENOS = {
 }
 
 
+def rodikliu(n: int) -> str:
+    """Skaičius su taisyklinga daugiskaita: 1 rodiklis, 3 rodikliai, 10 rodiklių, 21 rodiklis."""
+    if n % 10 == 1 and n % 100 != 11:
+        return f"{n} rodiklis"
+    if 2 <= n % 10 <= 9 and not 11 <= n % 100 <= 19:
+        return f"{n} rodikliai"
+    return f"{n} rodiklių"
+
+
 def saugiai(modulis):
     """Apskaičiuoja rodiklį. Jei nepavyksta su naujai atsisiųstais duomenimis – bando su saugyklos failais;
     jei ir tai nepavyksta – rodiklis praleidžiamas, bet svetainė vis tiek sugeneruojama."""
@@ -100,6 +109,7 @@ def main():
     env = Environment(loader=FileSystemLoader(SAKNIS / "sablonai"), autoescape=True)
     env.filters["sk"] = sk
     env.filters["laikotarpis"] = zmoniu_laikotarpis
+    env.filters["rodikliu"] = rodikliu
     from plotly.offline import get_plotlyjs_version
     import hashlib
     css_versija = hashlib.md5((SAKNIS / "statika" / "stilius.css").read_bytes()).hexdigest()[:8]
@@ -175,7 +185,9 @@ def main():
     (ISVESTIS / "index.html").write_text(
         env.get_template("index.html").render(sritys=sritys, bendra=bendra, vertinti=vertinti,
                                               pagrindiniai=pagrindiniai, daliu_sk=daliu_sk,
-                                              is_viso=len(visi), **bendri), encoding="utf-8")
+                                              is_viso=len(visi),
+                                              pagr_sk=sum(len(s["pagrindines"]) for s in sritys),
+                                              kitu_sk=sum(len(s["kitos"]) for s in sritys), **bendri), encoding="utf-8")
     (ISVESTIS / "metodika.html").write_text(
         env.get_template("metodika.html").render(sritys=sritys, **bendri), encoding="utf-8")
     for i, (sritis, r) in enumerate(visi):
