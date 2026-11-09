@@ -11,6 +11,7 @@ generuoti.py              # surenka rodiklius ir sugeneruoja svetainę į _site/
 rodikliai/
   bendra.py               # bendros priemonės: duomenų skaitymas, vertinimas, grafikų stilius
   saltiniai.py            # duomenų rinkiniai, naudojami kelių rodiklių
+  skurdas.py, nelygybe.py   # 1 sritis (Eurostat EU-SILC: ilc_li02, ilc_li10, ilc_peps01n, ilc_mdsd11, ilc_di11, ilc_di12, tps00100, tps00098)
   realusis_du.py          # 1 rodiklis = 1 failas
   energijos_kainos.py
   busto_ispirkamumas.py
@@ -114,3 +115,15 @@ ATNAUJINTI=1 python generuoti.py
 | Anksti mokslus palikę jaunuoliai | dalis sumažėja > 0,5 p. p. | padidėja > 0,5 p. p. | tarp jų |
 
 Taisyklės rodomos ir kiekvieno rodiklio puslapyje. Jas verta suderinti su darbo grupe.
+
+
+## Sudedamosios dalys
+
+Be pagrindinio rodiklio, kiekvienas papildomas Lietuvos matas, rodomas rodiklio grafikuose (pvz., sukčiavimas šalia
+nusikalstamumo be sukčiavimo, lietuvių kalba šalia matematikos, jaunimo nedarbas), turi savo vertinimą.
+Jis sukuriamas funkcija `dalis()` (`rodikliai/bendra.py`) ir perduodamas `Rodiklis(dalys=[...])`.
+Logika ta pati: naujausia reikšmė lyginama su tuo pačiu laikotarpiu prieš metus (metiniai – su ankstesniu tašku),
+pokytis mažesnis už slenkstį – stabilu. Visi šie vertinimai įskaičiuojami į bendrą suvestinę ir sričių korteles.
+Nevertinama: ES / NATO palyginimai, vieno skaičiaus išskaidymai (pvz., pagal kelio tipą ar pilietybę) ir
+rodiklio skaičiavimo įvestys (pvz., nominalūs atlyginimai realiojo DU rodiklyje). Prieglobsčio prašymai ir migracijos
+srautai rodomi kaip „Stebimas“.

@@ -1,0 +1,71 @@
+"""1. Pajamų nelygybė: S80/S20 santykis + Gini koeficientas."""
+import pandas as pd
+import plotly.graph_objects as go
+
+from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius
+from .eurostat_duomenys import serija
+
+SLENKSTIS = 0.2     # santykio punktų per metus
+
+
+def rodiklis() -> Rodiklis:
+    f = dict(age="TOTAL", sex="T", unit="RAT")
+    lt, es = serija("ilc_di11", "LT", **f), serija("ilc_di11", "EU27_2020", **f)
+    gini_lt = serija("ilc_di12", "LT", age="TOTAL", statinfo="GINI_HND")
+    gini_es = serija("ilc_di12", "EU27_2020", age="TOTAL", statinfo="GINI_HND")
+    pask, pries = lt.iloc[-1], lt.iloc[-2]
+    metai, ankst = lt.index[-1].year, lt.index[-2].year
+    pokytis = pask - pries
+    busena = ivertink(pokytis, "mazesne", SLENKSTIS)
+
+    nuo = "2005-01-01"
+    f1 = go.Figure()
+    linijos(f1, [("Lietuva", lt[lt.index >= nuo], SERIJOS[0]), ("ES-27", es[es.index >= nuo], SERIJOS[1])],
+            vnt="", zenklas=False, dec=2, zymekliai=True)
+    stilius(f1, "Pajamų kvintilių santykis S80/S20",
+            "Kiek kartų turtingiausių 20 % gyventojų pajamos didesnės už mažiausiai uždirbančių 20 %",
+            "Šaltinis: Eurostat, ilc_di11 (EU-SILC)", vnt="", nulio_linija=False, metiniai=True)
+    f1.update_yaxes(rangemode="tozero")
+
+    f2 = go.Figure()
+    linijos(f2, [("Lietuva", gini_lt[gini_lt.index >= nuo], SERIJOS[0]),
+                 ("ES-27", gini_es[gini_es.index >= nuo], SERIJOS[1])], vnt="", zenklas=False, zymekliai=True)
+    stilius(f2, "Gini koeficientas", "0 – visų pajamos vienodos, 100 – visos pajamos tenka vienam žmogui",
+            "Šaltinis: Eurostat, ilc_di12 (EU-SILC)", vnt="", nulio_linija=False, metiniai=True)
+    f2.update_yaxes(rangemode="tozero")
+
+    lentele = pd.DataFrame({"LT_S80_S20": lt, "ES27_S80_S20": es, "LT_Gini": gini_lt, "ES27_Gini": gini_es})
+    lentele = lentele[lentele.index >= nuo]
+    lentele.insert(0, "metai", lentele.index.year)
+
+    _dalys = [dalis("Gini koeficientas", gini_lt, "mazesne", 0.5, vienetai="", slenkscio_vnt=" punkto")]
+
+    kryptis = "sumažėjo" if pokytis < 0 else ("padidėjo" if pokytis > 0 else "nepasikeitė")
+    return Rodiklis(
+        dalys=_dalys,
+        id="nelygybe",
+        pavadinimas="Pajamų nelygybė",
+        trumpas_aprasas="turtingiausių ir vargingiausių 20 % pajamų santykis",
+        reiksme=pask, vienetai="", laikotarpis=str(metai), busena=busena,
+        zenklas=False, dec=2, spark_nuo_nulio=False,
+        vertinimo_taisykle=(f"Gerėja, kai santykis per metus sumažėja daugiau nei {sk(SLENKSTIS, False)}; "
+                            f"prastėja, kai padidėja daugiau nei {sk(SLENKSTIS, False)}; kitu atveju – stabilu."),
+        vertinimo_paaiskinimas=(f"{metai} m. tyrimo duomenimis, turtingiausių 20 % gyventojų pajamos buvo "
+                                f"{sk(pask, False, 2)} karto didesnės nei mažiausias pajamas gaunančių 20 % "
+                                f"({ankst} m. – {sk(pries, False, 2)}). Santykis "
+                                + (f"{kryptis} {sk(abs(pokytis), False, 2)}" if pokytis else kryptis)
+                                + f"; ES vidurkis – {sk(es.iloc[-1], False, 2)}. Gini koeficientas – "
+                                f"{sk(gini_lt.iloc[-1], False)} (ES – {sk(gini_es.iloc[-1], False)})."),
+        sparkline=lt[lt.index >= "2010-01-01"],
+        grafikai=[f1, f2],
+        apibrezimas=("S80/S20 – 20 % didžiausias ekvivalentines disponuojamąsias pajamas gaunančių gyventojų pajamų "
+                     "sumos ir 20 % mažiausias pajamas gaunančių gyventojų pajamų sumos santykis. Gini koeficientas "
+                     "apibendrina viso pajamų pasiskirstymo nelygybę."),
+        pastabos=["Duomenys – EU-SILC tyrimo: metų tyrimas aprašo praėjusių metų pajamas.",
+                  "Lietuvoje pajamų nelygybė viena didžiausių ES."],
+        saltiniai=[("Eurostat – ilc_di11", "https://ec.europa.eu/eurostat/databrowser/view/ilc_di11/default/table?lang=en"),
+                   ("Eurostat – ilc_di12", "https://ec.europa.eu/eurostat/databrowser/view/ilc_di12/default/table?lang=en")],
+        papildomai=[(sk(gini_lt.iloc[-1], False), f"Gini koeficientas, {gini_lt.index[-1].year} m."),
+                    (sk(es.iloc[-1], False, 2), "S80/S20 ES vidurkis")],
+        lentele=lentele,
+    )

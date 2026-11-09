@@ -27,6 +27,21 @@ MENESIAI = ["sausis", "vasaris", "kovas", "balandis", "gegužė", "birželis", "
 
 # ---------------- Rodiklio aprašas ----------------
 @dataclass
+class Dalis:
+    """Papildomas (sudedamasis) rodiklio grafiko matas su savo vertinimu."""
+    pavadinimas: str
+    reiksme: float
+    vienetai: str
+    laikotarpis: str          # 2026M09 / 2026K2 / 2025
+    busena: str
+    pokytis: str              # pvz. „−0,4 p. p.“ arba „+3,0 %“
+    palyginimas: str          # pvz. „lyginant su 2025 m. rugsėju“
+    taisykle: str
+    zenklas: bool = False
+    dec: int = 1
+
+
+@dataclass
 class Rodiklis:
     id: str
     pavadinimas: str
@@ -48,6 +63,7 @@ class Rodiklis:
     dec: int = 1                         # skaitmenų po kablelio
     spark_nuo_nulio: bool = True         # ar mažame grafike rodyti nulį (pokyčiams – taip)
     palyginimas: str | None = None       # palyginimo pagrindas; jei None – nustatomas automatiškai pagal laikotarpį
+    dalys: list[Dalis] = field(default_factory=list)   # sudedamosios dalys su savo vertinimu
 
 
 # ---------------- Duomenys ----------------
@@ -144,7 +160,8 @@ def ivertink(reiksme: float, gera_kryptis: str, slenkstis: float) -> str:
     """gera_kryptis: 'didesne' arba 'mazesne'. Pokytis, mažesnis už slenkstį, laikomas stabiliu."""
     if reiksme is None or pd.isna(reiksme):
         return "nera"
-    if abs(reiksme) < slenkstis:
+    reiksme = round(float(reiksme), 6)          # kad 0,4999999 ar −0,5000001 nebūtų vertinami atsitiktinai
+    if abs(reiksme) <= slenkstis:       # taisyklė: keičiasi tik pokytis, DIDESNIS už slenkstį
         return "stabilu"
     gerai = reiksme > 0 if gera_kryptis == "didesne" else reiksme < 0
     return "gereja" if gerai else "prasteja"
@@ -241,3 +258,65 @@ def palyginimo_tekstas(laikotarpis: str) -> str:
     if m := re.match(r"^(\d{4})", laikotarpis):
         return f"lyginant su {int(m[1]) - 1} m."
     return ""
+
+
+def _daznis(s: pd.Series) -> str:
+    if len(s) < 2:
+        return "A"
+    tarpas = pd.Series(s.index).diff().dt.days.median()
+    return "M" if tarpas < 40 else ("Q" if tarpas < 100 else "A")
+
+
+def _laik(d: pd.Timestamp, daznis: str) -> str:
+    if daznis == "M":
+        return f"{d.year}M{d.month:02d}"
+    if daznis == "Q":
+        return f"{d.year}K{(d.month - 1) // 3 + 1}"
+    return str(d.year)
+
+
+def dalis(pavadinimas: str, s: pd.Series, kryptis: str, slenkstis: float, budas: str = "pp",
+          vienetai: str = "%", dec: int = 1, zenklas: bool = False, slenkscio_vnt: str | None = None) -> Dalis:
+    """Įvertina papildomą matą ta pačia logika kaip pagrindinius rodiklius: naujausia reikšmė lyginama su tuo pačiu
+    laikotarpiu prieš metus (metiniams – su ankstesniu turimu tašku).
+    budas: „pp“ – skirtumas (proc. punktai ar vienetai), „proc“ – santykinis pokytis %, „lygis“ – vertinama pati
+    reikšmė (ji jau yra metinis pokytis ar skirtumas), „info“ – nevertinama."""
+    s = pd.to_numeric(s, errors="coerce").dropna().sort_index()
+    daznis = _daznis(s)
+    d, v = s.index[-1], float(s.iloc[-1])
+    laik = _laik(d, daznis)
+    if daznis == "A":
+        pries_d = s.index[-2] if len(s) > 1 else None
+        palyg = f"lyginant su {pries_d.year} m." if pries_d is not None else ""
+    else:
+        pries_d = d - pd.DateOffset(years=1)
+        pries_d = pries_d if pries_d in s.index else None
+        palyg = palyginimo_tekstas(laik)
+    u = slenkscio_vnt if slenkscio_vnt is not None else (" p. p." if vienetai.strip() == "%" else vienetai)
+    if budas == "info":
+        return Dalis(pavadinimas, v, vienetai, laik, "info", "", "nevertinama",
+                     "Informacinis matas – jo kryptis savaime nėra nei gera, nei bloga.", zenklas, dec)
+    if budas == "lygis":
+        pok = v
+        tekstas = f"{sk(v, True, dec)}{' %' if vienetai.strip() == '%' else vienetai}"
+        auga, mazeja = "didesnis nei", "mažesnis nei"
+        taisykle = (f"Gerėja, kai reikšmė {'didesnė' if kryptis == 'didesne' else 'mažesnė'} nei "
+                    f"{sk(slenkstis if kryptis == 'didesne' else -slenkstis)}{u}; prastėja, kai "
+                    f"{'mažesnė' if kryptis == 'didesne' else 'didesnė'} nei "
+                    f"{sk(-slenkstis if kryptis == 'didesne' else slenkstis)}{u}; kitu atveju – stabilu.")
+    else:
+        if pries_d is None:
+            return Dalis(pavadinimas, v, vienetai, laik, "nera", "", "nėra palyginimo",
+                         "Nėra ankstesnio laikotarpio duomenų.", zenklas, dec)
+        pv = float(s[pries_d])
+        if budas == "proc":
+            pok = (v / pv - 1) * 100 if pv else float("nan")
+            tekstas, u = f"{sk(pok)} %", " %"
+        else:
+            pok = v - pv
+            tekstas = f"{sk(pok, True, dec)}{u}"
+        geras, blogas = ("padidėja", "sumažėja") if kryptis == "didesne" else ("sumažėja", "padidėja")
+        taisykle = (f"Gerėja, kai {geras} daugiau nei {sk(slenkstis, False)}{u}; prastėja, kai {blogas} "
+                    f"daugiau nei {sk(slenkstis, False)}{u}; kitu atveju – stabilu.")
+    return Dalis(pavadinimas, v, vienetai, laik, ivertink(pok, kryptis, slenkstis), tekstas, palyg, taisykle,
+                 zenklas, dec)
