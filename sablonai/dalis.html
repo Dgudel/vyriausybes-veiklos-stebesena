@@ -40,7 +40,7 @@
     {% if r.saltiniai %}<p class="vv-pastaba">Šaltiniai: {% for pav, url in r.saltiniai %}<a href="{{ url }}">{{ pav }}</a>{% if not loop.last %}; {% endif %}{% endfor %}</p>{% endif %}
   </section>
 
-  {% set kitos = sritis.kitos %}
+  {% set kitos = sritis.pagrindines|selectattr('tevas', 'defined')|list + sritis.kitos %}
   {% set i = kitos.index(x) %}
   <nav class="ankst-kitas" aria-label="Kiti rodikliai">
     {% if i > 0 %}<a href="{{ kitos[i-1].id }}.html"><span>← Ankstesnis</span><b>{{ kitos[i-1].pavadinimas }}</b></a>{% else %}<span></span>{% endif %}

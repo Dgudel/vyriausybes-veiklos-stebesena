@@ -152,8 +152,9 @@ def sk(v: float | None, zenklas: bool = True, dec: int = 1) -> str:
     """Skaičius lietuvišku formatu: +3,2"""
     if v is None or pd.isna(v):
         return "–"
-    t = f"{v:+.{dec}f}" if zenklas else f"{v:.{dec}f}"
-    return t.replace(".", ",").replace("-", "−")
+    grupuoti = "," if abs(v) >= 10000 or (abs(v) >= 1000 and dec == 0) else ""   # 9 457, 12 345,6
+    t = f"{v:+{grupuoti}.{dec}f}" if zenklas else f"{v:{grupuoti}.{dec}f}"
+    return t.replace(",", "\u202f").replace(".", ",").replace("-", "−")
 
 
 # ---------------- Vertinimas ----------------

@@ -22,6 +22,18 @@ SAKNIS = Path(__file__).resolve().parent
 ISVESTIS = SAKNIS / "_site"
 
 # Sritys ir jų rodikliai. Kol srities rodikliai neparuošti, rodikliai = [].
+# Sudedamosios dalys, rodomos tarp pagrindinių kortelių (tėvinio rodiklio id, dalies pavadinimo pradžia)
+# (tėvinio rodiklio id, dalies pavadinimo pradžia, kortelės pavadinimas, trumpas aprašas)
+ISKELTI = {
+    4: [("atsinaujinanti-energija", "Energetinė priklausomybė", "Energetinė priklausomybė",
+         "importuojama energijos poreikių dalis")],
+    5: [("nusikalstamumas", "Sukčiavimas", "Sukčiavimas", "registruotų atvejų pokytis per metus"),
+        ("nusikalstamumas", "Tyčiniai nužudymai", "Tyčiniai nužudymai", "100 tūkst. gyventojų"),
+        ("migracijos-valdymas", "Prieglobsčio prašymai", "Prieglobsčio prašymai", "pirmų prašymų per mėnesį")],
+    6: [("gyventoju-kaita", "Suminis gimstamumo", "Gimstamumas", "vaikų vienai moteriai"),
+        ("emigracija-grizimas", "Išvyko", "Emigracija", "išvykusių Lietuvos piliečių per metus")],
+}
+
 SRITYS = [
     {"nr": 1, "trumpai": "Gyvenimo lygis", "pavadinimas": "Gyvenimo lygis ir sąlygos",
      "klausimas": "Ar žmonių materialinė gerovė gerėja?",
@@ -130,7 +142,20 @@ def main():
     vertinti = sum(bendra[k] for k in ("gereja", "stabilu", "prasteja"))
 
     for sritis in sritys:
-        sritis["kitos"] = [x for r in sritis["rodikliai"] for x in r.dalys if x.busena != "nera"]
+        visos_dalys = [x for r in sritis["rodikliai"] for x in r.dalys if x.busena != "nera"]
+        iskeltos = []
+        for tevas, pradzia, pavadinimas, aprasas in ISKELTI.get(sritis["nr"], []):
+            x = next((d for d in visos_dalys if d.tevas.id == tevas and d.pavadinimas.startswith(pradzia)), None)
+            if x is None:
+                print(f"  ⚠ iškelti nepavyko: {tevas} / {pradzia}")
+                continue
+            x.pavadinimas, x.trumpas_aprasas = pavadinimas, aprasas
+            x.nesutampa = []
+            iskeltos.append(x)
+        for r in sritis["rodikliai"]:          # iškeltos dalys turi savo kortelę – tėvo kortelėje jų nekartojame
+            r.nesutampa = [d for d in r.nesutampa if d not in iskeltos]
+        sritis["pagrindines"] = list(sritis["rodikliai"]) + iskeltos
+        sritis["kitos"] = [x for x in visos_dalys if x not in iskeltos]
         for x in sritis["kitos"]:
             s = x.serija.dropna() if x.serija is not None else None
             if s is not None and len(s) > 1:

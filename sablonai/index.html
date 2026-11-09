@@ -83,7 +83,7 @@
 
   {% if s.rodikliai %}
   <div class="korteles">
-    {% for r in s.rodikliai %}
+    {% for r in s.pagrindines %}
     <a class="kortele kortele-{{ r.busena }}" href="rodikliai/{{ r.id }}.html">
       <div class="kortele-virsus">
         <h3>{{ r.pavadinimas }}</h3>
@@ -93,6 +93,7 @@
       <div class="kortele-skaicius">{{ r.reiksme|sk(r.zenklas, r.dec) }}<span class="vnt">{{ r.vienetai }}</span></div>
       <div class="kortele-aprasas">{{ r.trumpas_aprasas }} · {{ r.laikotarpis|laikotarpis }}</div>
       {% if r.palyginimas and r.busena != "info" %}<div class="kortele-palyg">{{ busenos[r.busena].zodis }}, {{ r.palyginimas }}</div>{% endif %}
+      {% if r.tevas is defined %}<div class="kortele-palyg">Dalis rodiklio „{{ r.tevas.pavadinimas }}“</div>{% endif %}
       {% if r.nesutampa %}
       <ul class="kortele-dalys" aria-label="Kitaip vertinamos dalys">
         {% for x in r.nesutampa[:2] %}
