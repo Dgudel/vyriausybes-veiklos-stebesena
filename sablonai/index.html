@@ -109,6 +109,27 @@
     </a>
     {% endfor %}
   </div>
+  {% if s.kitos %}
+  <details class="kiti">
+    <summary><span class="kiti-pav">Kiti rodikliai ({{ s.kitos|length }})</span>
+      <span class="kiti-taskai" aria-hidden="true">{% for x in s.kitos %}<i class="t-{{ x.busena }}"></i>{% endfor %}</span>
+      <span class="kiti-rodykle" aria-hidden="true">▾</span></summary>
+    <div class="korteles korteles-mazos">
+      {% for x in s.kitos %}
+      <a class="kortele kortele-maza kortele-{{ x.busena }}" href="rodikliai/{{ x.id }}.html">
+        <div class="kortele-virsus">
+          <h3>{{ x.pavadinimas }}</h3>
+          <span class="zyme zyme-{{ x.busena }}"><span aria-hidden="true">{{ busenos[x.busena].ikona }}</span> {{ busenos[x.busena].zodis }}</span>
+        </div>
+        <div class="kortele-skaicius">{{ x.reiksme|sk(x.zenklas, x.dec) }}<span class="vnt">{{ x.vienetai }}</span></div>
+        <div class="kortele-aprasas">{{ x.laikotarpis|laikotarpis }}{% if x.pokytis %} · {{ x.pokytis }}{% endif %}</div>
+        <div class="kortele-palyg">Dalis rodiklio „{{ x.tevas.pavadinimas }}“</div>
+        {{ x.spark|safe }}
+      </a>
+      {% endfor %}
+    </div>
+  </details>
+  {% endif %}
   {% else %}
   <p class="rengiama">Rodikliai rengiami.</p>
   {% endif %}

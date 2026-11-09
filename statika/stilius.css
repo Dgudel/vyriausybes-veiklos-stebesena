@@ -262,3 +262,21 @@ a { color: var(--akcentas); }
 .vv-pastaba { font-size: 13px; color: var(--tekstas-blankus); margin: 8px 0 0; }
 .met-dalis td { font-size: 13.5px; background: #fbfbfa; }
 .met-dalis td:first-child { font-weight: 400 !important; padding-left: 22px; }
+
+/* ---------- Kiti rodikliai (sudedamosios dalys) ---------- */
+.kiti { margin-top: 16px; border: 1px solid var(--linija); border-radius: var(--spindulys); background: #fafaf8; }
+.kiti > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; font-weight: 650; font-size: 15px; }
+.kiti > summary::-webkit-details-marker { display: none; }
+.kiti > summary:hover { background: var(--fonas); border-radius: var(--spindulys); }
+.kiti-taskai { display: flex; flex-wrap: wrap; gap: 3px; flex: 1; }
+.kiti-taskai i { width: 8px; height: 8px; border-radius: 2px; }
+.kiti-rodykle { transition: transform .15s; color: var(--tekstas-antr); }
+.kiti[open] .kiti-rodykle { transform: rotate(180deg); }
+.korteles-mazos { padding: 4px 16px 16px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.kortele-maza { padding: 14px; }
+.kortele-maza h3 { font-size: 14px; }
+.kortele-maza .kortele-skaicius { font-size: 26px; margin-top: 4px; }
+.kortele-maza .kortele-aprasas { font-size: 13px; }
+.kortele-maza .zyme { font-size: 11px; padding: 2px 7px; }
+.dalis-tevas { margin: 16px 0 0; font-size: 14px; color: var(--tekstas-antr); }

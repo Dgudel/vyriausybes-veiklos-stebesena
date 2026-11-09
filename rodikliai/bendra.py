@@ -39,6 +39,7 @@ class Dalis:
     taisykle: str
     zenklas: bool = False
     dec: int = 1
+    serija: "pd.Series | None" = None      # duomenys grafikui ir mažajam grafikui
 
 
 @dataclass
@@ -292,22 +293,23 @@ def dalis(pavadinimas: str, s: pd.Series, kryptis: str, slenkstis: float, budas:
         pries_d = d - pd.DateOffset(years=1)
         pries_d = pries_d if pries_d in s.index else None
         palyg = palyginimo_tekstas(laik)
+    sd = 2 if 0 < slenkstis < 0.1 else 1          # slenksčio skaitmenys po kablelio
     u = slenkscio_vnt if slenkscio_vnt is not None else (" p. p." if vienetai.strip() == "%" else vienetai)
     if budas == "info":
         return Dalis(pavadinimas, v, vienetai, laik, "info", "", "nevertinama",
-                     "Informacinis matas – jo kryptis savaime nėra nei gera, nei bloga.", zenklas, dec)
+                     "Informacinis matas – jo kryptis savaime nėra nei gera, nei bloga.", zenklas, dec, s)
     if budas == "lygis":
         pok = v
         tekstas = f"{sk(v, True, dec)}{' %' if vienetai.strip() == '%' else vienetai}"
         auga, mazeja = "didesnis nei", "mažesnis nei"
         taisykle = (f"Gerėja, kai reikšmė {'didesnė' if kryptis == 'didesne' else 'mažesnė'} nei "
-                    f"{sk(slenkstis if kryptis == 'didesne' else -slenkstis)}{u}; prastėja, kai "
+                    f"{sk(slenkstis if kryptis == 'didesne' else -slenkstis, True, sd)}{u}; prastėja, kai "
                     f"{'mažesnė' if kryptis == 'didesne' else 'didesnė'} nei "
-                    f"{sk(-slenkstis if kryptis == 'didesne' else slenkstis)}{u}; kitu atveju – stabilu.")
+                    f"{sk(-slenkstis if kryptis == 'didesne' else slenkstis, True, sd)}{u}; kitu atveju – stabilu.")
     else:
         if pries_d is None:
             return Dalis(pavadinimas, v, vienetai, laik, "nera", "", "nėra palyginimo",
-                         "Nėra ankstesnio laikotarpio duomenų.", zenklas, dec)
+                         "Nėra ankstesnio laikotarpio duomenų.", zenklas, dec, s)
         pv = float(s[pries_d])
         if budas == "proc":
             pok = (v / pv - 1) * 100 if pv else float("nan")
@@ -316,10 +318,10 @@ def dalis(pavadinimas: str, s: pd.Series, kryptis: str, slenkstis: float, budas:
             pok = v - pv
             tekstas = f"{sk(pok, True, dec)}{u}"
         geras, blogas = ("padidėja", "sumažėja") if kryptis == "didesne" else ("sumažėja", "padidėja")
-        taisykle = (f"Gerėja, kai {geras} daugiau nei {sk(slenkstis, False)}{u}; prastėja, kai {blogas} "
-                    f"daugiau nei {sk(slenkstis, False)}{u}; kitu atveju – stabilu.")
+        taisykle = (f"Gerėja, kai {geras} daugiau nei {sk(slenkstis, False, sd)}{u}; prastėja, kai {blogas} "
+                    f"daugiau nei {sk(slenkstis, False, sd)}{u}; kitu atveju – stabilu.")
     return Dalis(pavadinimas, v, vienetai, laik, ivertink(pok, kryptis, slenkstis), tekstas, palyg, taisykle,
-                 zenklas, dec)
+                 zenklas, dec, s)
 
 
 def papildomas_grafikas(pavadinimas: str, paantraste: str, saltinis: str, serijos: list, vnt: str = "",
@@ -338,3 +340,9 @@ def papildomas_grafikas(pavadinimas: str, paantraste: str, saltinis: str, serijo
     if nuo_nulio:
         f.update_yaxes(rangemode="tozero")
     return f
+
+
+def slugas(tekstas: str) -> str:
+    import unicodedata
+    x = unicodedata.normalize("NFKD", tekstas).encode("ascii", "ignore").decode().lower()
+    return re.sub(r"[^a-z0-9]+", "-", x).strip("-")[:60]

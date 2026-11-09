@@ -6,6 +6,8 @@
 Peržiūra kompiuteryje:  python -m http.server -d _site 8000  ->  http://localhost:8000
 """
 import os
+
+import pandas as pd
 import shutil
 from datetime import date
 from pathlib import Path
@@ -14,7 +16,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from rodikliai import (pasitenkinimas, savizudybes, regionai, atsinaujinanti_energija, oro_tarsa, skurdas, nelygybe, imigracija, migracijos_valdymas, senejimas, grizimas, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
                        sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
-from rodikliai.bendra import sk, sparkline_svg, zmoniu_laikotarpis, palyginimo_tekstas
+from rodikliai.bendra import slugas, papildomas_grafikas, sk, sparkline_svg, zmoniu_laikotarpis, palyginimo_tekstas
 
 SAKNIS = Path(__file__).resolve().parent
 ISVESTIS = SAKNIS / "_site"
@@ -103,6 +105,10 @@ def main():
             if r.palyginimas is None:
                 r.palyginimas = palyginimo_tekstas(r.laikotarpis)
             r.spark = sparkline_svg(r.sparkline, nuo_nulio=r.spark_nuo_nulio) if r.sparkline is not None else ""
+            for x in r.dalys:
+                x.id = f"{r.id}--{slugas(x.pavadinimas)}"
+                x.tevas = r
+                x.spark = sparkline_svg(x.serija, nuo_nulio=False) if x.serija is not None and len(x.serija) > 1 else ""
             r.grafiku_html = [f.to_html(full_html=False, include_plotlyjs=False,
                                         config={"displaylogo": False, "responsive": True,
                                                 "toImageButtonOptions": {"format": "png", "scale": 2}})
@@ -123,6 +129,24 @@ def main():
     daliu_sk = sum(len([x for x in r.dalys if x.busena in ("gereja", "stabilu", "prasteja")]) for _, r in visi)
     vertinti = sum(bendra[k] for k in ("gereja", "stabilu", "prasteja"))
 
+    for sritis in sritys:
+        sritis["kitos"] = [x for r in sritis["rodikliai"] for x in r.dalys if x.busena != "nera"]
+        for x in sritis["kitos"]:
+            s = x.serija.dropna() if x.serija is not None else None
+            if s is not None and len(s) > 1:
+                if len(s) > 40 and (s.index[-1] - s.index[0]).days > 365 * 15:
+                    s = s[s.index >= s.index[-1] - pd.DateOffset(years=15)]
+                vnt = " %" if x.vienetai.strip() == "%" else x.vienetai
+                f = papildomas_grafikas(x.pavadinimas, f"Lietuva · rodiklio „{x.tevas.pavadinimas}“ sudedamoji dalis",
+                                        "Šaltiniai – žr. pagrindinį rodiklį", [("Lietuva", s)], vnt=vnt, dec=x.dec,
+                                        nuo_nulio=False, zenklas=x.zenklas)
+                x.grafiko_html = f.to_html(full_html=False, include_plotlyjs=False, config={"displaylogo": False,
+                                           "responsive": True, "locale": "lt"})
+                x.lentele_eil = [(d, v) for d, v in zip(s.index, s.values)][::-1][:12]
+            else:
+                x.grafiko_html, x.lentele_eil = "", []
+            (ISVESTIS / "rodikliai" / f"{x.id}.html").write_text(
+                env.get_template("dalis.html").render(x=x, r=x.tevas, sritis=sritis, **bendri), encoding="utf-8")
     (ISVESTIS / "index.html").write_text(
         env.get_template("index.html").render(sritys=sritys, bendra=bendra, vertinti=vertinti,
                                               pagrindiniai=pagrindiniai, daliu_sk=daliu_sk,
