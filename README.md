@@ -1,4 +1,4 @@
-# Vyriausybės veiklos stebėsenos švieslentė (prototipas)
+# Vyriausybės veiklos stebėsenos švieslentė
 
 Statinė svetainė: pagrindinis puslapis su 6 sritimis ir rodiklių kortelėmis, kiekvienam rodikliui –
 atskiras puslapis su grafikais, vertinimu (gerėja / stabilu / prastėja), apibrėžimu, šaltiniais ir CSV.
