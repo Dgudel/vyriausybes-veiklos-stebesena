@@ -35,35 +35,6 @@ statika/stilius.css       # išvaizda
 duomenys/                 # duomenų failai (xlsx / csv)
 .github/workflows/        # automatinis generavimas ir paskelbimas
 ```
-
-## Paleidimas savo kompiuteryje
-
-```bash
-pip install -r requirements.txt
-python generuoti.py
-python -m http.server -d _site 8000     # atidarykite http://localhost:8000
-```
-
-## Paskelbimas GitHub Pages (vieną kartą)
-
-1. GitHub'e sukurkite **viešą** repozitoriją (geriausia – institucijos organizacijos paskyroje).
-2. Įkelkite visus šio aplanko failus (išskyrus `_site/`).
-3. Repozitorijoje: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-4. **Actions** skiltyje pamatysite „Švieslentės atnaujinimas“ – po 1–2 min. svetainė bus adresu
-   `https://<paskyra>.github.io/<repozitorija>/`.
-
-Svetainė perkuriama kiekvieną kartą įkėlus pakeitimus, kasdien ir rankiniu būdu (Actions → Run workflow).
-
-## Kaip pridėti naują rodiklį
-
-1. Įdėkite duomenų failą į `duomenys/`.
-2. Nukopijuokite `rodikliai/realusis_du.py` nauju pavadinimu ir pakeiskite:
-   duomenų skaitymą, reikšmę, **vertinimo taisyklę** (`ivertink(reiksme, "didesne"/"mazesne", slenkstis)`),
-   grafikus, apibrėžimą, šaltinius.
-3. `generuoti.py` sąraše `SRITYS` įrašykite modulį į reikiamą sritį.
-
-Kiekvienas rodiklis – atskiras failas, todėl kolegos gali dirbti lygiagrečiai.
-
 ## Automatinis duomenų atnaujinimas
 
 GitHub Actions svetainę perkuria **kasdien** (5:00 UTC) ir prieš tai atsisiunčia naujausius duomenis:
