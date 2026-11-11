@@ -2,7 +2,7 @@
 {% set kelias = "../" %}
 {% block title %}{{ x.pavadinimas }} · {{ t("Vyriausybės veiklos stebėsena", "Government Performance Monitor") }}{% endblock %}
 {% block head %}
-{% if x.grafiko_html %}<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@{{ plotlyjs_versija }}/plotly.min.js" charset="utf-8"></script>{% endif %}
+{% if x.grafiko_html %}<script src="{{ kelias }}statika/plotly.min.js?v={{ plotly_hash }}" charset="utf-8"></script>{% endif %}
 {% endblock %}
 {% block turinys %}
 <nav class="kelias-nav"><a href="../index.html#sritis-{{ sritis.nr }}">← {{ sritis.nr }}. {{ sritis.pavadinimas }}</a></nav>

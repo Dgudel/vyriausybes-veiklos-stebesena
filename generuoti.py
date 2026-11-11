@@ -97,6 +97,20 @@ def rodikliu(n: int) -> str:
     return f"{n} rodiklių"
 
 
+def saugus_csv(df: pd.DataFrame) -> pd.DataFrame:
+    """Apsauga nuo CSV formulių injekcijos: tekstinis langelis, prasidedantis =, +, -, @, tab ar CR
+    (ir nesantis skaičiumi), gauna priekyje apostrofą, kad Excel jo nevykdytų kaip formulės."""
+    import re
+    pavojinga = re.compile(r"^[=+\-@\t\r]")
+    skaicius = re.compile(r"^[+-]?\d+([.,]\d+)?([eE][+-]?\d+)?$")
+    df = df.copy()
+    df.columns = [("'" + c) if isinstance(c, str) and pavojinga.match(c) else c for c in df.columns]
+    for c in df.columns:
+        if df[c].dtype == object or str(df[c].dtype) in ("string", "str"):
+            df[c] = df[c].map(lambda v: "'" + v if isinstance(v, str) and pavojinga.match(v) and not skaicius.match(v) else v)
+    return df
+
+
 def pirma_didzioji(s: str) -> str:
     return s[:1].upper() + s[1:] if s else s
 
@@ -135,6 +149,10 @@ def generuok(kalba: str, isvestis: Path, bendra_info: dict):
     (isvestis / "rodikliai").mkdir(parents=True)
     (isvestis / "duomenys").mkdir()
     shutil.copytree(SAKNIS / "statika", isvestis / "statika")
+    # Grafikų biblioteka laikoma pačioje svetainėje (ne iš išorinio CDN) – ta pati versija, kurią naudoja plotly paketas
+    import plotly
+    plotly_js = Path(plotly.__file__).parent / "package_data" / "plotly.min.js"
+    shutil.copy(plotly_js, isvestis / "statika" / "plotly.min.js")
 
     env = Environment(loader=FileSystemLoader(SAKNIS / "sablonai"), autoescape=True)
     env.filters["sk"] = sk
@@ -149,6 +167,7 @@ def generuok(kalba: str, isvestis: Path, bendra_info: dict):
     bendri = {"busenos": busenos, "atnaujinta": date.today().strftime("%Y-%m-%d"), "css_versija": css_versija,
               "metai": date.today().year, "kalba": kalba, "en": en(),
               "plotlyjs_versija": get_plotlyjs_version(),
+              "plotly_hash": hashlib.md5(plotly_js.read_bytes()).hexdigest()[:8],
               # MRU logotipas: įdėkite statika/mru-logo.svg (arba .png) – bus rodomas apačioje
               "mru_logo": next((f"statika/{f.name}" for f in sorted((SAKNIS / "statika").glob("mru-logo.*"))), None)}
 
@@ -181,7 +200,8 @@ def generuok(kalba: str, isvestis: Path, bendra_info: dict):
                                         config={**grafiko_cfg, **({} if en() else {"locale": "lt"})})
                               for f in r.grafikai]
             if r.lentele is not None:
-                r.lentele.round(2).to_csv(isvestis / "duomenys" / f"{r.id}.csv", index=False, encoding="utf-8-sig")
+                saugus_csv(r.lentele.round(2)).to_csv(isvestis / "duomenys" / f"{r.id}.csv", index=False,
+                                                      encoding="utf-8-sig")
             rodikliai.append(r)
         for r in rodikliai:
             r.visos_busenos = [r.busena] + [x.busena for x in r.dalys]
