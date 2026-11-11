@@ -12,6 +12,24 @@ KATEGORIJOS = [("ICCS0101", "Tyčiniai nužudymai"), ("ICCS0401", "Plėšimai"),
                ("ICCS0501", "Įsilaužimai"), ("ICCS0502", "Vagystės"), ("ICCS0701", "Sukčiavimas")]
 
 VISOS_ITEM, SUKC_ITEM = 439622, 438141
+# Sunkūs ir labai sunkūs nusikaltimai: A – ištirta, B – užregistruota, C – užregistruota, tyrimas nebaigtas
+SUNKUS_A, SUNKUS_B, SUNKUS_C = 447130, 447126, 447125
+ISTIRTA_SLENKSTIS = 1.0   # p. p.
+
+
+def _istirtu_dalis():
+    """X = A / (B + C) × 100 %, kiekvienais metais tam pačiam kaupiamajam laikotarpiui (sausis–naujausias mėnuo).
+    Grąžina (metinė serija, naujausias mėnuo, lentelė)."""
+    a = ird.lentele(SUNKUS_A, "ird_sunkus_istirta.csv")
+    b = ird.lentele(SUNKUS_B, "ird_sunkus_uzregistruota.csv")
+    c = ird.lentele(SUNKUS_C, "ird_sunkus_nebaigta.csv")
+    d = (a.rename(columns={"reiksme": "A"}).merge(b.rename(columns={"reiksme": "B"}), on=["metai", "men"])
+          .merge(c.rename(columns={"reiksme": "C"}), on=["metai", "men"]).sort_values(["metai", "men"]))
+    d["X"] = d.A / (d.B + d.C) * 100
+    men = int(d.iloc[-1].men)
+    m = d[d.men == men].set_index("metai")
+    s = pd.Series(m.X.values, index=pd.to_datetime(m.index.astype(str) + "-01-01"))
+    return s, men, d
 SLENKSTIS = 2.0     # % per metus
 TRUMPI = ["saus.", "vas.", "kov.", "bal.", "geg.", "birž.", "liep.", "rugp.", "rugs.", "spal.", "lapkr.", "gruod."]
 
@@ -111,6 +129,23 @@ def rodiklis() -> Rodiklis:
         dx = dalis(vardas, s, "mazesne", SLENKSTIS, budas="lygis", zenklas=True, slenkscio_vnt=" %")
         dx.laikotarpis, dx.palyginimas = laikotarpis, palyginimo_tekstas(laikotarpis)
         _dalys.append(dx)
+    f4 = None
+    try:
+        ist, ist_men, _ = _istirtu_dalis()
+        ist_laik = f"{ist.index[-1].year} m. " + ("sausis" if ist_men == 1 else f"sausis–{MENESIAI[ist_men - 1]}")
+        dx = dalis("Ištirtų sunkių ir labai sunkių nusikaltimų dalis", ist, "didesne", ISTIRTA_SLENKSTIS)
+        dx.laikotarpis, dx.palyginimas = ist_laik, palyginimo_tekstas(ist_laik)
+        _dalys.append(dx)
+        f4 = go.Figure()
+        linijos(f4, [("Ištirta dalis", ist[ist.index >= "2010-01-01"], SERIJOS[0])], vnt=" %", zenklas=False, dec=1)
+        laik_zod = "sausis" if ist_men == 1 else f"sausis–{MENESIAI[ist_men - 1]}"
+        stilius(f4, "Ištirtų sunkių ir labai sunkių nusikaltimų dalis",
+                f"Ištirta / (užregistruota + nebaigti tyrimai) × 100, kiekvienų metų {laik_zod}, %",
+                "Šaltinis: IRD prie VRM, Nusikalstamų veikų žinybinis registras", vnt=" %", nulio_linija=False,
+                metiniai=True)
+        f4.update_yaxes(rangemode="tozero")
+    except Exception as e:
+        print(f"  ⚠ ištirtų dalis neapskaičiuota: {e}")
     for kodas, vardas in KATEGORIJOS[:4]:
         try:
             s = serija("crim_off_cat", "LT", iccs=kodas, unit="P_HTHAB")
@@ -132,7 +167,7 @@ def rodiklis() -> Rodiklis:
                                 f"{_tukst(pernai.be_sukc)}). Šis skaičius {kryptis} {sk(abs(pokytis), False)} %. "
                                 f"Sukčiavimo atvejų – {_tukst(pask.reiksme_sukc)}."),
         sparkline=pd.Series(metiniai["be_sukc"].values, index=x)[x >= "2010-01-01"],
-        grafikai=[f1, f2] + ([f3] if kat else []),
+        grafikai=[f1, f2] + ([f3] if kat else []) + ([f4] if f4 is not None else []),
         apibrezimas=("Visos Nusikalstamų veikų žinybiniame registre užregistruotos nusikalstamos veikos "
                      "(nusikaltimai ir baudžiamieji nusižengimai), atėmus sukčiavimą (BK 182 str.). Sukčiavimas "
                      "atskiriamas, nes jo, ypač nuotolinio, skaičius sparčiai kinta dėl kitų priežasčių nei "
@@ -140,10 +175,20 @@ def rodiklis() -> Rodiklis:
         pastabos=["IRD skelbia kaupiamuosius duomenis (nuo metų pradžios), todėl jų skaičius per metus visada auga. "
                   "Kad tai nebūtų klaidinanti, antrasis grafikas rodo pokytį, palyginti su tuo pačiu praėjusių metų "
                   "laikotarpiu: pvz., 2026 m. sausis–spalis lyginamas su 2025 m. sausiu–spaliu.",
-                  "Registruotų veikų skaičius priklauso ir nuo to, kiek žmonės praneša policijai."],
+                  "Registruotų veikų skaičius priklauso ir nuo to, kiek žmonės praneša policijai.",
+                  "Ištirtų sunkių ir labai sunkių nusikaltimų dalis skaičiuojama pagal formulę X = A / (B + C) × 100 %: "
+                  "A – ištirtų sunkių ir labai sunkių nusikaltimų skaičius, B – užregistruotų per ataskaitinį "
+                  "laikotarpį, C – užregistruotų, kurių ikiteisminis tyrimas nebaigtas. Kiekvienų metų reikšmė "
+                  "skaičiuojama tam pačiam laikotarpiui nuo metų pradžios, todėl metai tarpusavyje palyginami."],
         saltiniai=[("IRD – visos užregistruotos nusikalstamos veikos",
                     f"https://www.ird.lt/lt/indicators/opendata/item.{VISOS_ITEM}"),
                    ("IRD – sukčiavimas (BK 182 str.)", f"https://www.ird.lt/lt/indicators/opendata/item.{SUKC_ITEM}"),
+                   ("IRD – sunkūs ir labai sunkūs nusikaltimai: ištirta",
+                    f"https://www.ird.lt/lt/indicators/opendata/item.{SUNKUS_A}"),
+                   ("IRD – sunkūs ir labai sunkūs nusikaltimai: užregistruota",
+                    f"https://www.ird.lt/lt/indicators/opendata/item.{SUNKUS_B}"),
+                   ("IRD – sunkūs ir labai sunkūs nusikaltimai: tyrimas nebaigtas",
+                    f"https://www.ird.lt/lt/indicators/opendata/item.{SUNKUS_C}"),
                    ("Eurostat – crim_off_cat", "https://ec.europa.eu/eurostat/databrowser/view/crim_off_cat/default/table?lang=en")],
         papildomai=[(_tukst(pask.be_sukc), f"veikų be sukčiavimo, {laikotarpis}"),
                     (_tukst(metiniai["be_sukc"].iloc[-1]), f"per {metiniai.index[-1]} m.")],

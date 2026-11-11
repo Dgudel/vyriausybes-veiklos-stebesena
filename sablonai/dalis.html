@@ -27,7 +27,7 @@
     <h2>Naujausios reikšmės</h2>
     <div class="lentele-wrap"><table class="vv-lentele" style="min-width:0">
       <thead><tr><th>Laikotarpis</th><th>Reikšmė</th></tr></thead>
-      <tbody>{% for d, v in x.lentele_eil %}<tr><td>{{ d.strftime('%Y-%m') if d.month != 1 or x.laikotarpis|length > 4 else d.year }}</td><td>{{ v|sk(x.zenklas, x.dec) }}{{ ' ' if x.vienetai == '%' }}{{ x.vienetai }}</td></tr>{% endfor %}</tbody>
+      <tbody>{% for d, v in x.lentele_eil %}<tr><td>{{ d.year if x.metine else d.strftime('%Y-%m') }}</td><td>{{ v|sk(x.zenklas, x.dec) }}{{ ' ' if x.vienetai == '%' }}{{ x.vienetai }}</td></tr>{% endfor %}</tbody>
     </table></div>
   </section>
   {% endif %}

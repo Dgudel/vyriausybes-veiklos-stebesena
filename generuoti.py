@@ -180,6 +180,7 @@ def main():
                 x.grafiko_html = f.to_html(full_html=False, include_plotlyjs=False, config={"displaylogo": False,
                                            "responsive": True, "locale": "lt"})
                 x.lentele_eil = [(d, v) for d, v in zip(s.index, s.values)][::-1][:12]
+                x.metine = all(d.month == 1 and d.day == 1 for d in s.index)
             else:
                 x.grafiko_html, x.lentele_eil = "", []
             (ISVESTIS / "rodikliai" / f"{x.id}.html").write_text(
