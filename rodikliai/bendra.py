@@ -23,6 +23,67 @@ MENESIAI_SU = ["sausiu", "vasariu", "kovu", "balandžiu", "gegužiu", "birželiu
                "rugpjūčiu", "rugsėju", "spaliu", "lapkričiu", "gruodžiu"]
 MENESIAI = ["sausis", "vasaris", "kovas", "balandis", "gegužė", "birželis", "liepa",
             "rugpjūtis", "rugsėjis", "spalis", "lapkritis", "gruodis"]
+MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+          "November", "December"]
+
+# ---------------- Kalba ----------------
+# Svetainė generuojama dviem kalbomis: generuoti.py pirmiau nustato „lt“, paskui „en“ ir iš naujo apskaičiuoja rodiklius.
+KALBA = "lt"
+
+
+def nustatyk_kalba(k: str):
+    global KALBA
+    KALBA = k
+
+
+def en() -> bool:
+    return KALBA == "en"
+
+
+def t(lt: str, en_: str) -> str:
+    """Tekstas pagal dabartinę kalbą."""
+    return en_ if KALBA == "en" else lt
+
+
+def menuo(nr: int) -> str:
+    """Mėnesio pavadinimas (vardininkas), nr – 1…12."""
+    return (MONTHS if en() else MENESIAI)[nr - 1]
+
+
+def nuo_metu_pradzios(metai: int, men: int) -> str:
+    """Kaupiamasis laikotarpis: „2026 m. sausis–spalis“ / „January–October 2026“."""
+    if en():
+        return f"January {metai}" if men == 1 else f"January–{MONTHS[men - 1]} {metai}"
+    return f"{metai} m. sausis" if men == 1 else f"{metai} m. sausis–{MENESIAI[men - 1]}"
+
+
+def vnt_pp() -> str:
+    return " pp" if en() else " p. p."
+
+
+# Dažni grafikų legendų pavadinimai – EN versijoje verčiami automatiškai
+LEGENDOS_EN = {"Lietuva": "Lithuania", "ES-27": "EU-27", "ES": "EU", "ES vidurkis": "EU average",
+               "Latvija": "Latvia", "Estija": "Estonia", "Lenkija": "Poland", "Suomija": "Finland",
+               "Vokietija": "Germany", "Vyrai": "Men", "Moterys": "Women", "NATO vidurkis": "NATO average",
+               "Euro zona": "Euro area", "Merginos": "Girls", "Vaikinai": "Boys", "Matematika": "Mathematics",
+               "Lietuvių kalba": "Lithuanian language", "Lietuvių kalba ir literatūra": "Lithuanian language and literature"}
+
+
+def legenda(v: str) -> str:
+    return LEGENDOS_EN.get(v, v) if en() else v
+
+
+def saltinio_eilute(s: str) -> str:
+    """EN: „Šaltinis: Eurostat, x ir y; skaičiavimas“ → „Source: Eurostat, x and y; own calculation“."""
+    if not en():
+        return s
+    for a, b in [("Šaltiniai:", "Sources:"), ("Šaltinis:", "Source:"), (" ir ", " and "),
+                 ("skaičiavimas", "own calculation"), ("Valstybės duomenų agentūra", "State Data Agency of Lithuania"),
+                 ("rodikliai ", "indicators "), ("rodiklis ", "indicator "), ("IRD prie VRM", "IRD under the Ministry of the Interior"),
+                 ("Nusikalstamų veikų žinybinis registras", "Departmental Register of Criminal Offences"),
+                 ("Nacionalinė švietimo agentūra", "National Agency for Education")]:
+        s = s.replace(a, b)
+    return s
 
 
 # ---------------- Rodiklio aprašas ----------------
@@ -134,6 +195,12 @@ def i_data(laikotarpis: str) -> pd.Timestamp:
 def zmoniu_laikotarpis(laikotarpis: str, kada: bool = False) -> str:
     """2026M08 -> „2026 m. rugpjūtis“; kada=True -> „2026 m. rugpjūtį“ (sakinio viduje)."""
     x = str(laikotarpis)
+    if en():
+        if m := re.fullmatch(r"(\d{4})M(\d{1,2})", x):
+            return f"{MONTHS[int(m[2]) - 1]} {m[1]}"
+        if m := re.fullmatch(r"(\d{4})[KQ](\d)", x):
+            return f"Q{m[2]} {m[1]}"
+        return x
     if m := re.fullmatch(r"(\d{4})M(\d{1,2})", x):
         return f"{m[1]} m. {(MENESIAI_KADA if kada else MENESIAI)[int(m[2]) - 1]}"
     if m := re.fullmatch(r"(\d{4})[KQ](\d)", x):
@@ -153,8 +220,10 @@ def sk(v: float | None, zenklas: bool = True, dec: int = 1) -> str:
     if v is None or pd.isna(v):
         return "–"
     grupuoti = "," if abs(v) >= 10000 or (abs(v) >= 1000 and dec == 0) else ""   # 9 457, 12 345,6
-    t = f"{v:+{grupuoti}.{dec}f}" if zenklas else f"{v:{grupuoti}.{dec}f}"
-    return t.replace(",", "\u202f").replace(".", ",").replace("-", "−")
+    x = f"{v:+{grupuoti}.{dec}f}" if zenklas else f"{v:{grupuoti}.{dec}f}"
+    if en():
+        return x.replace("-", "−")
+    return x.replace(",", "\u202f").replace(".", ",").replace("-", "−")
 
 
 # ---------------- Vertinimas ----------------
@@ -174,7 +243,14 @@ def stilius(fig: go.Figure, pavadinimas: str, paantraste: str, saltinis: str, au
             vnt: str = " %", nulio_linija: bool = True, metiniai: bool = False):
     if nulio_linija:
         fig.add_hline(y=0, line=dict(color=TEKSTAS_ANTR, width=1))
-    fig.add_annotation(text=saltinis, xref="paper", yref="paper", x=0, y=-0.25, showarrow=False,
+    if en():
+        for tr in fig.data:
+            if getattr(tr, "name", None):
+                naujas = legenda(tr.name)
+                if naujas != tr.name and isinstance(tr.hovertemplate, str):
+                    tr.hovertemplate = tr.hovertemplate.replace(tr.name, naujas)
+                tr.name = naujas
+    fig.add_annotation(text=saltinio_eilute(saltinis), xref="paper", yref="paper", x=0, y=-0.25, showarrow=False,
                        xanchor="left", font=dict(size=11, color=TEKSTAS_ANTR))
     fig.update_layout(
         title=dict(text=f"<b>{pavadinimas}</b><br><span style='font-size:13px;color:{TEKSTAS_ANTR}'>{paantraste}</span>",
@@ -185,7 +261,7 @@ def stilius(fig: go.Figure, pavadinimas: str, paantraste: str, saltinis: str, au
         hovermode="x unified",
         hoverlabel=dict(bgcolor="white", font=dict(family=SRIFTAS, color=TEKSTAS)),
         legend=dict(orientation="h", y=1.0, x=0, yanchor="bottom", font=dict(size=12)),
-        separators=", ",
+        separators=".," if en() else ", ",
     )
     fig.update_xaxes(showgrid=False, ticklabelstandoff=10, tickformat="%Y" if metiniai else "%Y-%m")
     fig.update_yaxes(gridcolor=TINKLELIS, zeroline=False, ticksuffix=vnt, ticklabelstandoff=8)
@@ -250,6 +326,18 @@ def sparkline_svg(s: pd.Series, plotis: int = 140, aukstis: int = 40, nuo_nulio:
 def palyginimo_tekstas(laikotarpis: str) -> str:
     """Iš rodiklio laikotarpio – su kuo lyginama: tas pats laikotarpis prieš metus."""
     import re
+    if en():
+        if m := re.match(r"^(\d{4})M(\d{2})$", laikotarpis):
+            return f"compared with {MONTHS[int(m[2]) - 1]} {int(m[1]) - 1}"
+        if m := re.match(r"^(\d{4})K(\d)$", laikotarpis):
+            return f"compared with Q{m[2]} {int(m[1]) - 1}"
+        if m := re.match(r"^(January(?:–\w+)?) (\d{4})$", laikotarpis):
+            return f"compared with {m[1]} {int(m[2]) - 1}"
+        if m := re.match(r"^(\d{4})", laikotarpis):
+            return f"compared with {int(m[1]) - 1}"
+        if m := re.search(r"(\d{4})$", laikotarpis):
+            return f"compared with the same period of {int(m[1]) - 1}"
+        return ""
     if m := re.match(r"^(\d{4})M(\d{2})$", laikotarpis):
         return f"lyginant su {int(m[1]) - 1} m. {MENESIAI_SU[int(m[2]) - 1]}"
     if m := re.match(r"^(\d{4})K(\d)$", laikotarpis):
@@ -289,28 +377,34 @@ def dalis(pavadinimas: str, s: pd.Series, kryptis: str, slenkstis: float, budas:
     laik = _laik(d, daznis)
     if daznis == "A":
         pries_d = s.index[-2] if len(s) > 1 else None
-        palyg = f"lyginant su {pries_d.year} m." if pries_d is not None else ""
+        palyg = (t(f"lyginant su {pries_d.year} m.", f"compared with {pries_d.year}")
+                 if pries_d is not None else "")
     else:
         pries_d = d - pd.DateOffset(years=1)
         pries_d = pries_d if pries_d in s.index else None
         palyg = palyginimo_tekstas(laik)
     sd = 2 if 0 < slenkstis < 0.1 else 1          # slenksčio skaitmenys po kablelio
-    u = slenkscio_vnt if slenkscio_vnt is not None else (" p. p." if vienetai.strip() == "%" else vienetai)
+    u = slenkscio_vnt if slenkscio_vnt is not None else (vnt_pp() if vienetai.strip() == "%" else vienetai)
     if budas == "info":
-        return Dalis(pavadinimas, v, vienetai, laik, "info", "", "nevertinama",
-                     "Informacinis matas – jo kryptis savaime nėra nei gera, nei bloga.", zenklas, dec, s)
+        return Dalis(pavadinimas, v, vienetai, laik, "info", "", t("nevertinama", "not assessed"),
+                     t("Informacinis matas – jo kryptis savaime nėra nei gera, nei bloga.",
+                       "An informational measure – its direction is in itself neither good nor bad."), zenklas, dec, s)
     if budas == "lygis":
         pok = v
         tekstas = f"{sk(v, True, dec)}{' %' if vienetai.strip() == '%' else vienetai}"
-        auga, mazeja = "didesnis nei", "mažesnis nei"
-        taisykle = (f"Gerėja, kai reikšmė {'didesnė' if kryptis == 'didesne' else 'mažesnė'} nei "
-                    f"{sk(slenkstis if kryptis == 'didesne' else -slenkstis, True, sd)}{u}; prastėja, kai "
-                    f"{'mažesnė' if kryptis == 'didesne' else 'didesnė'} nei "
-                    f"{sk(-slenkstis if kryptis == 'didesne' else slenkstis, True, sd)}{u}; kitu atveju – stabilu.")
+        gera = sk(slenkstis if kryptis == 'didesne' else -slenkstis, True, sd) + u
+        bloga = sk(-slenkstis if kryptis == 'didesne' else slenkstis, True, sd) + u
+        if en():
+            taisykle = (f"Improving when the value is {'above' if kryptis == 'didesne' else 'below'} {gera}; "
+                        f"worsening when {'below' if kryptis == 'didesne' else 'above'} {bloga}; otherwise stable.")
+        else:
+            taisykle = (f"Gerėja, kai reikšmė {'didesnė' if kryptis == 'didesne' else 'mažesnė'} nei {gera}; "
+                        f"prastėja, kai {'mažesnė' if kryptis == 'didesne' else 'didesnė'} nei {bloga}; "
+                        f"kitu atveju – stabilu.")
     else:
         if pries_d is None:
-            return Dalis(pavadinimas, v, vienetai, laik, "nera", "", "nėra palyginimo",
-                         "Nėra ankstesnio laikotarpio duomenų.", zenklas, dec, s)
+            return Dalis(pavadinimas, v, vienetai, laik, "nera", "", t("nėra palyginimo", "no comparison"),
+                         t("Nėra ankstesnio laikotarpio duomenų.", "No data for the earlier period."), zenklas, dec, s)
         pv = float(s[pries_d])
         if budas == "proc":
             pok = (v / pv - 1) * 100 if pv else float("nan")
@@ -318,9 +412,13 @@ def dalis(pavadinimas: str, s: pd.Series, kryptis: str, slenkstis: float, budas:
         else:
             pok = v - pv
             tekstas = f"{sk(pok, True, dec)}{u}"
-        geras, blogas = ("padidėja", "sumažėja") if kryptis == "didesne" else ("sumažėja", "padidėja")
-        taisykle = (f"Gerėja, kai {geras} daugiau nei {sk(slenkstis, False, sd)}{u}; prastėja, kai {blogas} "
-                    f"daugiau nei {sk(slenkstis, False, sd)}{u}; kitu atveju – stabilu.")
+        r = sk(slenkstis, False, sd) + u
+        if en():
+            geras, blogas = ("rises", "falls") if kryptis == "didesne" else ("falls", "rises")
+            taisykle = f"Improving when it {geras} by more than {r}; worsening when it {blogas} by more than {r}; otherwise stable."
+        else:
+            geras, blogas = ("padidėja", "sumažėja") if kryptis == "didesne" else ("sumažėja", "padidėja")
+            taisykle = f"Gerėja, kai {geras} daugiau nei {r}; prastėja, kai {blogas} daugiau nei {r}; kitu atveju – stabilu."
     return Dalis(pavadinimas, v, vienetai, laik, ivertink(pok, kryptis, slenkstis), tekstas, palyg, taisykle,
                  zenklas, dec, s)
 

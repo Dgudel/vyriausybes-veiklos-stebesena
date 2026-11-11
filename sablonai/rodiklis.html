@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% set kelias = "../" %}
-{% block title %}{{ r.pavadinimas }} · Vyriausybės veiklos stebėsena{% endblock %}
+{% block title %}{{ r.pavadinimas }} · {{ t("Vyriausybės veiklos stebėsena", "Government Performance Monitor") }}{% endblock %}
 {% block head %}
 {% if r.grafiku_html %}<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@{{ plotlyjs_versija }}/plotly.min.js" charset="utf-8"></script>{% endif %}
 {% endblock %}
@@ -18,20 +18,20 @@
   <div class="vertinimas vertinimas-{{ r.busena }}">
     <span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span>
     {% if r.vertinimo_paaiskinimas %}<p>{{ r.vertinimo_paaiskinimas }}</p>{% endif %}
-    {% if r.palyginimas and r.busena != "info" %}<p class="taisykle"><b>Palyginimo pagrindas:</b> {{ r.palyginimas }}{% if not r.palyginimas.endswith('.') %}.{% endif %}</p>{% endif %}
-    <p class="taisykle"><b>Kaip vertinama.</b> {{ r.vertinimo_taisykle }} <a href="../metodika.html">Visos taisyklės</a></p>
+    {% if r.palyginimas and r.busena != "info" %}<p class="taisykle"><b>{{ t("Palyginimo pagrindas:", "Basis of comparison:") }}</b> {{ r.palyginimas }}{% if not r.palyginimas.endswith('.') %}.{% endif %}</p>{% endif %}
+    <p class="taisykle"><b>{{ t("Kaip vertinama.", "How it is assessed.") }}</b> {{ r.vertinimo_taisykle }} <a href="../metodika.html">{{ t("Visos taisyklės", "All rules") }}</a></p>
   </div>
 </section>
 
 {% if r.dalys %}
 <section class="visi-vertinimai" aria-labelledby="vv-pav">
-  <h2 id="vv-pav">Visi šio rodiklio vertinimai</h2>
+  <h2 id="vv-pav">{{ t("Visi šio rodiklio vertinimai", "All assessments for this indicator") }}</h2>
   <div class="lentele-wrap">
   <table class="vv-lentele">
-    <thead><tr><th>Matas</th><th>Reikšmė</th><th>Pokytis</th><th>Palyginimas</th><th>Būsena</th></tr></thead>
+    <thead><tr><th>{{ t("Matas", "Measure") }}</th><th>{{ t("Reikšmė", "Value") }}</th><th>{{ t("Pokytis", "Change") }}</th><th>{{ t("Palyginimas", "Comparison") }}</th><th>{{ t("Būsena", "Status") }}</th></tr></thead>
     <tbody>
       <tr class="vv-pagr">
-        <td>{{ r.pavadinimas }} <span class="vv-zyma">pagrindinis</span></td>
+        <td>{{ r.pavadinimas }} <span class="vv-zyma">{{ t("pagrindinis", "main") }}</span></td>
         <td>{{ r.reiksme|sk(r.zenklas, r.dec) }}{{ ' ' if r.vienetai == '%' }}{{ r.vienetai }} <span class="vv-laik">{{ r.laikotarpis|laikotarpis }}</span></td>
         <td>–</td>
         <td>{{ r.palyginimas or "–" }}</td>
@@ -49,7 +49,7 @@
     </tbody>
   </table>
   </div>
-  <p class="vv-pastaba">Kiekviena dalis vertinama ta pačia logika – lyginant su tuo pačiu laikotarpiu prieš metus. Taisyklės – <a href="../metodika.html#{{ r.id }}">metodikoje</a>. Visi šie vertinimai įskaičiuojami į bendrą suvestinę.</p>
+  <p class="vv-pastaba">{% if en %}Each component is assessed with the same logic – against the same period a year earlier. The rules are in the <a href="../metodika.html#{{ r.id }}">methodology</a>. All these assessments are included in the overall summary.{% else %}Kiekviena dalis vertinama ta pačia logika – lyginant su tuo pačiu laikotarpiu prieš metus. Taisyklės – <a href="../metodika.html#{{ r.id }}">metodikoje</a>. Visi šie vertinimai įskaičiuojami į bendrą suvestinę.{% endif %}</p>
 </section>
 {% endif %}
 
@@ -67,24 +67,24 @@
 
 <section class="aprasas">
   <div>
-    <h2>Apibrėžimas</h2>
+    <h2>{{ t("Apibrėžimas", "Definition") }}</h2>
     <p>{{ r.apibrezimas }}</p>
     {% if r.pastabos %}
-    <h2>Pastabos</h2>
+    <h2>{{ t("Pastabos", "Notes") }}</h2>
     <ul>{% for p in r.pastabos %}<li>{{ p }}</li>{% endfor %}</ul>
     {% endif %}
   </div>
   <div>
-    <h2>Šaltiniai</h2>
+    <h2>{{ t("Šaltiniai", "Sources") }}</h2>
     <ul>{% for pav, url in r.saltiniai %}<li><a href="{{ url }}" target="_blank" rel="noopener">{{ pav }}</a></li>{% endfor %}</ul>
     {% if r.lentele is not none %}
-    <h2>Duomenys</h2>
-    <p><a class="mygtukas" href="../duomenys/{{ r.id }}.csv" download>Atsisiųsti CSV</a></p>
+    <h2>{{ t("Duomenys", "Data") }}</h2>
+    <p><a class="mygtukas" href="../duomenys/{{ r.id }}.csv" download>{{ t("Atsisiųsti CSV", "Download CSV") }}</a></p>
     {% endif %}
   </div>
 </section>
-<nav class="ankst-kitas" aria-label="Kiti rodikliai">
-  {% if ankstesnis %}<a href="{{ ankstesnis.id }}.html"><span>← Ankstesnis</span><b>{{ ankstesnis.pavadinimas }}</b></a>{% else %}<span></span>{% endif %}
-  {% if kitas %}<a class="kitas" href="{{ kitas.id }}.html"><span>Kitas →</span><b>{{ kitas.pavadinimas }}</b></a>{% endif %}
+<nav class="ankst-kitas" aria-label="{{ t('Kiti rodikliai', 'Other indicators') }}">
+  {% if ankstesnis %}<a href="{{ ankstesnis.id }}.html"><span>← {{ t("Ankstesnis", "Previous") }}</span><b>{{ ankstesnis.pavadinimas }}</b></a>{% else %}<span></span>{% endif %}
+  {% if kitas %}<a class="kitas" href="{{ kitas.id }}.html"><span>{{ t("Kitas", "Next") }} →</span><b>{{ kitas.pavadinimas }}</b></a>{% endif %}
 </nav>
 {% endblock %}

@@ -8,7 +8,7 @@ import os
 
 import pandas as pd
 
-from .bendra import DUOMENYS, Rodiklis, ivertink, sk, zmoniu_laikotarpis
+from .bendra import DUOMENYS, Rodiklis, ivertink, sk, zmoniu_laikotarpis, t, legenda
 from .ekonomika_bendra import grafikas
 from .eurostat_duomenys import laikotarpis, serija
 
@@ -56,8 +56,9 @@ def rodiklis() -> Rodiklis:
     busena = ivertink(nuokrypis_dabar - nuokrypis_pries, "mazesne", SLENKSTIS)
     laik = laikotarpis(data, "M")
 
-    g = grafikas([("Lietuva", lt), (lyg_vardas, es)], "Infliacija (SVKI)",
-                 "Metinis vartojimo kainų pokytis, %; punktyras – ECB tikslas 2 %", saltinis, nuo="2015-01-01",
+    g = grafikas([("Lietuva", lt), (lyg_vardas, es)], t("Infliacija (SVKI)", "Inflation (HICP)"),
+                 t("Metinis vartojimo kainų pokytis, %; punktyras – ECB tikslas 2 %",
+                   "Annual change in consumer prices, %; dotted line – ECB target of 2%"), saltinis, nuo="2015-01-01",
                  nuo_nulio=False)
     g.add_hline(y=TIKSLAS, line=dict(color="#52514e", width=1, dash="dot"))
 
@@ -65,24 +66,37 @@ def rodiklis() -> Rodiklis:
     lentele = lentele[lentele.index >= "2015-01-01"]
     lentele.insert(0, "laikotarpis", [laikotarpis(d, "M") for d in lentele.index])
 
+    lyg = legenda(lyg_vardas)
     return Rodiklis(
-        id="infliacija", pavadinimas="Infliacija",
-        trumpas_aprasas="kainų pokytis per metus (SVKI)", reiksme=pask, vienetai="%", laikotarpis=laik, busena=busena,
+        id="infliacija", pavadinimas=t("Infliacija", "Inflation"),
+        trumpas_aprasas=t("kainų pokytis per metus (SVKI)", "annual change in prices (HICP)"), reiksme=pask, vienetai="%", laikotarpis=laik, busena=busena,
         zenklas=False, spark_nuo_nulio=True,
-        vertinimo_taisykle=(f"Vertinamas atstumas nuo ECB kainų stabilumo tikslo ({sk(TIKSLAS, False)} %), palyginti su tuo pačiu "
-                            f"mėnesiu prieš metus. Gerėja, kai infliacija priartėja prie tikslo daugiau nei {sk(SLENKSTIS, False)} "
-                            f"proc. punkto; prastėja, kai nutolsta daugiau nei {sk(SLENKSTIS, False)} proc. punkto; kitu atveju – stabilu."),
-        vertinimo_paaiskinimas=(f"{zmoniu_laikotarpis(laik, kada=True)} metinė infliacija buvo {sk(pask, False)} % "
-                                f"(prieš metus – {sk(pries, False)} %; {lyg_vardas} – {sk(es.iloc[-1], False)} %)."),
+        vertinimo_taisykle=t(f"Vertinamas atstumas nuo ECB kainų stabilumo tikslo ({sk(TIKSLAS, False)} %), palyginti su tuo pačiu "
+                             f"mėnesiu prieš metus. Gerėja, kai infliacija priartėja prie tikslo daugiau nei {sk(SLENKSTIS, False)} "
+                             f"proc. punkto; prastėja, kai nutolsta daugiau nei {sk(SLENKSTIS, False)} proc. punkto; kitu atveju – stabilu.",
+                             f"Assesses the distance from the ECB price stability target ({sk(TIKSLAS, False)}%) compared "
+                             f"with the same month a year earlier. Improving when inflation moves closer to the target by "
+                             f"more than {sk(SLENKSTIS, False)} percentage point; worsening when it moves away by more "
+                             f"than {sk(SLENKSTIS, False)} percentage point; otherwise stable."),
+        vertinimo_paaiskinimas=t(f"{zmoniu_laikotarpis(laik, kada=True)} metinė infliacija buvo {sk(pask, False)} % "
+                                 f"(prieš metus – {sk(pries, False)} %; {lyg_vardas} – {sk(es.iloc[-1], False)} %).",
+                                 f"In {zmoniu_laikotarpis(laik)}, annual inflation was {sk(pask, False)}% "
+                                 f"(a year earlier: {sk(pries, False)}%; {lyg}: {sk(es.iloc[-1], False)}%)."),
         sparkline=lt[lt.index >= "2019-01-01"], grafikai=[g],
-        apibrezimas=("Suderintasis vartojimo kainų indeksas (SVKI) – metinis kainų pokytis, palyginti su tuo pačiu "
-                     "praėjusių metų mėnesiu. SVKI pasirinktas, nes palyginamas su kitomis ES šalimis. "
-                     "Tai ne vidutinė metinė infliacija."),
-        pastabos=["Nuo 2026 m. SVKI skaičiuojamas pagal naują ECOICOP 2 klasifikaciją; Eurostat lentelė prc_hicp_manr "
-                  "pasibaigė 2025 m. gruodžio duomenimis, todėl naujesni duomenys imami iš ECB.",
-                  "1 srityje (energijos kainos, darbo užmokestis) naudojami VDA specialiųjų grupių indeksai."],
+        apibrezimas=t("Suderintasis vartojimo kainų indeksas (SVKI) – metinis kainų pokytis, palyginti su tuo pačiu "
+                      "praėjusių metų mėnesiu. SVKI pasirinktas, nes palyginamas su kitomis ES šalimis. "
+                      "Tai ne vidutinė metinė infliacija.",
+                      "Harmonised Index of Consumer Prices (HICP) – annual change in prices compared with the same month "
+                      "of the previous year. The HICP was chosen because it is comparable with other EU countries. "
+                      "This is not average annual inflation."),
+        pastabos=[t("Nuo 2026 m. SVKI skaičiuojamas pagal naują ECOICOP 2 klasifikaciją; Eurostat lentelė prc_hicp_manr "
+                    "pasibaigė 2025 m. gruodžio duomenimis, todėl naujesni duomenys imami iš ECB.",
+                    "Since 2026 the HICP has been calculated under the new ECOICOP 2 classification; the Eurostat table "
+                    "prc_hicp_manr ends with December 2025, so newer data are taken from the ECB."),
+                  t("1 srityje (energijos kainos, darbo užmokestis) naudojami VDA specialiųjų grupių indeksai.",
+                    "Area 1 (energy prices, wages) uses the State Data Agency's special group indices.")],
         saltiniai=[("Eurostat – HICP", "https://ec.europa.eu/eurostat/web/hicp/information-data"),
                    ("ECB Data Portal – HICP", "https://data.ecb.europa.eu/data/datasets/ICP")],
-        papildomai=[(f"{sk(es.iloc[-1], False)} %", f"{lyg_vardas}, {zmoniu_laikotarpis(laikotarpis(es.index[-1], 'M'))}")],
+        papildomai=[(f"{sk(es.iloc[-1], False)} %", f"{lyg}, {zmoniu_laikotarpis(laikotarpis(es.index[-1], 'M'))}")],
         lentele=lentele,
     )

@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html lang="lt">
+<html lang="{{ kalba }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}Vyriausybės veiklos stebėsena{% endblock %}</title>
-<meta name="description" content="Vyriausybės veiklos stebėsenos sistema: rodikliai, jų kitimas ir vertinimas.">
+<title>{% block title %}{{ t("Vyriausybės veiklos stebėsena", "Government Performance Monitor") }}{% endblock %}</title>
+<meta name="description" content="{{ t('Vyriausybės veiklos stebėsenos sistema: rodikliai, jų kitimas ir vertinimas.', 'Lithuanian Government performance monitoring system: indicators, their trends and assessment.') }}">
 <link rel="stylesheet" href="{{ kelias }}statika/stilius.css?v={{ css_versija }}">
+{% if en %}<link rel="alternate" hreflang="lt" href="{{ kelias }}../{{ puslapis }}">{% else %}<link rel="alternate" hreflang="en" href="{{ kelias }}en/{{ puslapis }}">{% endif %}
 {% block head %}{% endblock %}
 </head>
 <body>
 <header class="virsus">
   <div class="plotis">
-    <a class="logo" href="{{ kelias }}index.html">Vyriausybės veiklos stebėsena</a>
-    <nav class="meniu" aria-label="Pagrindinis meniu">
-      <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}index.html#suvestine">Suvestinė</a>
+    <a class="logo" href="{{ kelias }}index.html">{{ t("Vyriausybės veiklos stebėsena", "Government Performance Monitor") }}</a>
+    <nav class="meniu" aria-label="{{ t('Pagrindinis meniu', 'Main menu') }}">
+      <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}index.html#suvestine">{{ t("Suvestinė", "Overview") }}</a>
       <details class="meniu-sritys">
-        <summary>Sritys <span aria-hidden="true" class="rodykle">▾</span></summary>
+        <summary>{{ t("Sritys", "Areas") }} <span aria-hidden="true" class="rodykle">▾</span></summary>
         <div class="meniu-skydas">
-          <a class="meniu-siaura" href="{{ kelias }}index.html#suvestine">Suvestinė</a>
+          <a class="meniu-siaura" href="{{ kelias }}index.html#suvestine">{{ t("Suvestinė", "Overview") }}</a>
           {% for s in meniu_sritys %}
           <a href="{{ kelias }}index.html#sritis-{{ s.nr }}">
             <span class="meniu-nr">{{ s.nr }}</span>
@@ -25,10 +26,11 @@
             <span class="meniu-taskai" aria-hidden="true">{% for r in s.rodikliai %}<i class="t-{{ r.busena }}"></i>{% endfor %}</span>
           </a>
           {% endfor %}
-          <a class="meniu-siaura" href="{{ kelias }}metodika.html">Vertinimo metodika</a>
+          <a class="meniu-siaura" href="{{ kelias }}metodika.html">{{ t("Vertinimo metodika", "Assessment methodology") }}</a>
         </div>
       </details>
-      <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}metodika.html">Metodika</a>
+      <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}metodika.html">{{ t("Metodika", "Methodology") }}</a>
+      {% if en %}<a hreflang="lt" href="{{ kelias }}../{{ puslapis }}" class="kalba" lang="lt" title="Lietuviškai">LT</a>{% else %}<a hreflang="en" href="{{ kelias }}en/{{ puslapis }}" class="kalba" lang="en" title="In English">EN</a>{% endif %}
     </nav>
   </div>
 </header>
@@ -38,17 +40,27 @@
 <footer class="apacia">
   <div class="plotis apacia-tinklelis">
     <div class="apacia-kurejas">
-      {% if mru_logo %}<a href="https://www.mruni.eu/" class="apacia-logo"><img src="{{ kelias }}{{ mru_logo }}" alt="Mykolo Romerio universitetas" height="48"></a>{% endif %}
-      <p class="apacia-pav">Švieslentės kūrėjas – <b>Mykolo Romerio universitetas</b></p>
+      {% if mru_logo %}<a href="https://www.mruni.eu/{{ 'en/' if en }}" class="apacia-logo"><img src="{{ kelias }}{{ mru_logo }}" alt="{{ t('Mykolo Romerio universitetas', 'Mykolas Romeris University') }}" height="48"></a>{% endif %}
+      <p class="apacia-pav">{{ t("Švieslentės kūrėjas –", "Created by") }} <b>{{ t("Mykolo Romerio universitetas", "Mykolas Romeris University") }}</b></p>
       <address class="apacia-kontaktai">
-        Ateities g. 20, LT-08303 Vilnius<br>
-        Juridinio asmens kodas 111951726<br>
-        Tel. <a href="tel:+37061027509">+370 610 27509</a>
+        {{ t("Ateities g. 20, LT-08303 Vilnius", "Ateities g. 20, LT-08303 Vilnius, Lithuania") }}<br>
+        {{ t("Juridinio asmens kodas", "Legal entity code") }} 111951726<br>
+        {{ t("Tel.", "Phone") }} <a href="tel:+37061027509">+370 610 27509</a>
       </address>
-      <p>© {{ metai }} Mykolo Romerio universitetas. Visos teisės saugomos.
-         Statistiniai duomenys priklauso jų teikėjams ir naudojami pagal jų pakartotinio naudojimo sąlygas.</p>
+      <p>© {{ metai }} {{ t("Mykolo Romerio universitetas. Visos teisės saugomos.", "Mykolas Romeris University. All rights reserved.") }}
+         {{ t("Statistiniai duomenys priklauso jų teikėjams ir naudojami pagal jų pakartotinio naudojimo sąlygas.", "Statistical data belong to their providers and are used under their re-use terms.") }}</p>
     </div>
     <div>
+      {% if en %}
+      <p>Data sources: State Data Agency of Lithuania (data.gov.lt), Eurostat, European Central Bank,
+         National Agency for Education, Information Technology and Communications Department under the Ministry of the Interior, NATO.
+         Data are checked daily; page updated {{ atnaujinta }}.
+         <a href="{{ kelias }}metodika.html">Assessment methodology</a>.</p>
+      <p class="apacia-di"><span class="di-zyma" aria-hidden="true">AI</span>
+         Artificial intelligence was used in building this dashboard (Anthropic Claude Opus 5.5 Medium model).
+         Indicator values and assessments are calculated automatically according to published rules, without AI.
+         <a href="{{ kelias }}metodika.html#di">More on the use of AI</a>.</p>
+      {% else %}
       <p>Duomenų šaltiniai: Valstybės duomenų agentūra (data.gov.lt), Eurostat, Europos Centrinis Bankas,
          Nacionalinė švietimo agentūra, VRM Informatikos ir ryšių departamentas, NATO.
          Duomenys tikrinami kasdien; puslapis atnaujintas {{ atnaujinta }}.
@@ -57,6 +69,7 @@
          Kuriant švieslentę naudotas dirbtinis intelektas (Anthropic Claude Opus 5.5 Medium modelis).
          Rodiklių reikšmės ir vertinimai apskaičiuojami automatiškai pagal skelbiamas taisykles, be DI.
          <a href="{{ kelias }}metodika.html#di">Plačiau apie DI naudojimą</a>.</p>
+      {% endif %}
     </div>
   </div>
 </footer>

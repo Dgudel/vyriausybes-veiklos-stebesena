@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 {% set kelias = "../" %}
-{% block title %}{{ x.pavadinimas }} · Vyriausybės veiklos stebėsena{% endblock %}
+{% block title %}{{ x.pavadinimas }} · {{ t("Vyriausybės veiklos stebėsena", "Government Performance Monitor") }}{% endblock %}
 {% block head %}
 {% if x.grafiko_html %}<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@{{ plotlyjs_versija }}/plotly.min.js" charset="utf-8"></script>{% endif %}
 {% endblock %}
 {% block turinys %}
 <nav class="kelias-nav"><a href="../index.html#sritis-{{ sritis.nr }}">← {{ sritis.nr }}. {{ sritis.pavadinimas }}</a></nav>
-<p class="dalis-tevas">Sudedamoji rodiklio „<a href="{{ r.id }}.html">{{ r.pavadinimas }}</a>“ dalis</p>
+<p class="dalis-tevas">{% if en %}Component of the indicator “<a href="{{ r.id }}.html">{{ r.pavadinimas }}</a>”{% else %}Sudedamoji rodiklio „<a href="{{ r.id }}.html">{{ r.pavadinimas }}</a>“ dalis{% endif %}</p>
 <section class="rodiklio-galva">
   <div>
     <h1>{{ x.pavadinimas }}</h1>
     <div class="didelis">{{ x.reiksme|sk(x.zenklas, x.dec) }}<span class="vnt">{{ x.vienetai }}</span></div>
-    <div class="kortele-aprasas">{{ x.laikotarpis|laikotarpis }}{% if x.pokytis %} · pokytis {{ x.pokytis }}{% endif %}</div>
+    <div class="kortele-aprasas">{{ x.laikotarpis|laikotarpis }}{% if x.pokytis %} · {{ t("pokytis", "change") }} {{ x.pokytis }}{% endif %}</div>
   </div>
   <div class="vertinimas vertinimas-{{ x.busena }}">
     <span class="zyme zyme-{{ x.busena }}"><span aria-hidden="true">{{ busenos[x.busena].ikona }}</span> {{ busenos[x.busena].zodis }}</span>
-    {% if x.palyginimas and x.busena != "info" %}<p class="taisykle"><b>Palyginimo pagrindas:</b> {{ x.palyginimas }}{% if not x.palyginimas.endswith('.') %}.{% endif %}</p>{% endif %}
-    <p class="taisykle"><b>Kaip vertinama.</b> {{ x.taisykle }} <a href="../metodika.html#{{ r.id }}">Visos taisyklės</a></p>
+    {% if x.palyginimas and x.busena != "info" %}<p class="taisykle"><b>{{ t("Palyginimo pagrindas:", "Basis of comparison:") }}</b> {{ x.palyginimas }}{% if not x.palyginimas.endswith('.') %}.{% endif %}</p>{% endif %}
+    <p class="taisykle"><b>{{ t("Kaip vertinama.", "How it is assessed.") }}</b> {{ x.taisykle }} <a href="../metodika.html#{{ r.id }}">{{ t("Visos taisyklės", "All rules") }}</a></p>
   </div>
 </section>
 
@@ -24,26 +24,29 @@
 
   {% if x.lentele_eil %}
   <section class="visi-vertinimai">
-    <h2>Naujausios reikšmės</h2>
+    <h2>{{ t("Naujausios reikšmės", "Latest values") }}</h2>
     <div class="lentele-wrap"><table class="vv-lentele" style="min-width:0">
-      <thead><tr><th>Laikotarpis</th><th>Reikšmė</th></tr></thead>
+      <thead><tr><th>{{ t("Laikotarpis", "Period") }}</th><th>{{ t("Reikšmė", "Value") }}</th></tr></thead>
       <tbody>{% for d, v in x.lentele_eil %}<tr><td>{{ d.year if x.metine else d.strftime('%Y-%m') }}</td><td>{{ v|sk(x.zenklas, x.dec) }}{{ ' ' if x.vienetai == '%' }}{{ x.vienetai }}</td></tr>{% endfor %}</tbody>
     </table></div>
   </section>
   {% endif %}
 
   <section class="visi-vertinimai">
-    <h2>Apie šį matą</h2>
+    <h2>{{ t("Apie šį matą", "About this measure") }}</h2>
+    {% if en %}<p>This measure is shown as a component of the indicator <a href="{{ r.id }}.html">“{{ r.pavadinimas }}”</a> and
+       is included in the overall summary. Definitions, all charts, the EU comparison and data sources are on the
+       <a href="{{ r.id }}.html">main indicator page</a>.</p>{% else %}
     <p>Šis matas rodomas kaip rodiklio <a href="{{ r.id }}.html">„{{ r.pavadinimas }}“</a> sudedamoji dalis ir
        įskaičiuojamas į bendrą suvestinę. Apibrėžimai, visi grafikai, palyginimas su ES ir duomenų šaltiniai –
-       <a href="{{ r.id }}.html">pagrindinio rodiklio puslapyje</a>.</p>
-    {% if r.saltiniai %}<p class="vv-pastaba">Šaltiniai: {% for pav, url in r.saltiniai %}<a href="{{ url }}">{{ pav }}</a>{% if not loop.last %}; {% endif %}{% endfor %}</p>{% endif %}
+       <a href="{{ r.id }}.html">pagrindinio rodiklio puslapyje</a>.</p>{% endif %}
+    {% if r.saltiniai %}<p class="vv-pastaba">{{ t("Šaltiniai:", "Sources:") }} {% for pav, url in r.saltiniai %}<a href="{{ url }}">{{ pav }}</a>{% if not loop.last %}; {% endif %}{% endfor %}</p>{% endif %}
   </section>
 
   {% set kitos = sritis.pagrindines|selectattr('tevas', 'defined')|list + sritis.kitos %}
   {% set i = kitos.index(x) %}
-  <nav class="ankst-kitas" aria-label="Kiti rodikliai">
-    {% if i > 0 %}<a href="{{ kitos[i-1].id }}.html"><span>← Ankstesnis</span><b>{{ kitos[i-1].pavadinimas }}</b></a>{% else %}<span></span>{% endif %}
-    {% if i + 1 < kitos|length %}<a class="kitas" href="{{ kitos[i+1].id }}.html"><span>Kitas →</span><b>{{ kitos[i+1].pavadinimas }}</b></a>{% endif %}
+  <nav class="ankst-kitas" aria-label="{{ t('Kiti rodikliai', 'Other indicators') }}">
+    {% if i > 0 %}<a href="{{ kitos[i-1].id }}.html"><span>← {{ t("Ankstesnis", "Previous") }}</span><b>{{ kitos[i-1].pavadinimas }}</b></a>{% else %}<span></span>{% endif %}
+    {% if i + 1 < kitos|length %}<a class="kitas" href="{{ kitos[i+1].id }}.html"><span>{{ t("Kitas", "Next") }} →</span><b>{{ kitos[i+1].pavadinimas }}</b></a>{% endif %}
   </nav>
 {% endblock %}

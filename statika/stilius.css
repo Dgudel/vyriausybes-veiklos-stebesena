@@ -305,3 +305,8 @@ a { color: var(--akcentas); }
 .apacia-logo { display: inline-block; margin-bottom: 10px; }
 .apacia-logo img { height: 48px; width: auto; display: block; }
 .apacia-kontaktai { font-style: normal; margin: 0 0 10px; line-height: 1.55; }
+
+/* Kalbos perjungiklis */
+.meniu .kalba { margin-left: 6px; padding: 3px 8px; border: 1px solid var(--linija); border-radius: 6px;
+  font-size: 13px; font-weight: 600; letter-spacing: .03em; color: var(--tekstas); text-decoration: none; }
+.meniu .kalba:hover { border-color: var(--tekstas-antr); }

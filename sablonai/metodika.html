@@ -1,7 +1,52 @@
 {% extends "base.html" %}
 {% set kelias = "" %}
-{% block title %}Vertinimo metodika · Vyriausybės veiklos stebėsena{% endblock %}
+{% block title %}{{ t("Vertinimo metodika", "Assessment methodology") }} · {{ t("Vyriausybės veiklos stebėsena", "Government Performance Monitor") }}{% endblock %}
 {% block turinys %}
+{% if en %}
+<nav class="kelias-nav"><a href="index.html">← Dashboard</a></nav>
+<section class="ivadas metodika-ivadas">
+  <h1>How it is assessed: improving, stable or worsening</h1>
+  <p>The status of each indicator is determined automatically according to a rule published in advance, so the
+     assessment does not depend on who calculates it or when.</p>
+  <ol class="metodika-zingsniai">
+    <li><b>What it is compared with.</b> The latest value is compared with <b>the same period a year earlier</b>
+        (monthly data with the same month, quarterly data with the same quarter, annual data with the previous
+        year). This removes seasonal swings: for example, heating-season prices are compared with the previous heating
+        season. Values are not compared with the previous month or against a long-term trend.</li>
+    <li><b>Direction.</b> For each indicator it is defined which direction is good (e.g. falling unemployment,
+        rising wages).</li>
+    <li><b>Threshold.</b> A change smaller than the threshold set for the indicator counts as <b>stable</b>, so that
+        random fluctuations and survey error are not shown as improvement or worsening.</li>
+    <li><b>Components.</b> If an indicator page also charts other measures for Lithuania (e.g. fraud alongside crime
+        excluding fraud, Lithuanian language alongside mathematics), each of them is assessed separately with the same
+        logic and included in the overall summary. Comparisons with EU or NATO averages and breakdowns of a single
+        figure (e.g. by road type) are not assessed.</li>
+    <li><b>Exceptions.</b> Some indicators are themselves annual changes (e.g. real wages, GDP growth) or comparisons
+        (housing and energy prices relative to wage growth), so their size is assessed. Population change is assessed
+        by whether the population is growing or shrinking. Immigration is shown without an assessment (◆ Monitored).</li>
+  </ol>
+</section>
+
+<section class="metodika-sritis metodika-di" id="di" aria-labelledby="di-pav">
+  <h2 id="di-pav">Use of artificial intelligence</h2>
+  <p>In line with the principle of transparency and Article 50 of the EU Artificial Intelligence Act
+     (Regulation (EU) 2024/1689), we inform you that an artificial intelligence system – the
+     <b>Anthropic Claude Opus 5.5 Medium</b> model – was used in building this dashboard.</p>
+  <ul>
+    <li><b>What AI was used for:</b> writing the program code (data download, processing, charts and site
+        generation), selecting datasets, and drafting indicator descriptions, assessment rules, explanation templates
+        and the English translation.</li>
+    <li><b>What AI is not used for:</b> AI is not used while the site is running. Indicator values, changes and
+        statuses (“improving”, “stable”, “worsening”) are calculated automatically every day from official source data
+        according to the rules published on this page, and explanatory sentences are built from the calculated figures
+        using predefined templates.</li>
+    <li><b>Human oversight:</b> the choice of indicators, assessment rules, thresholds and site content were reviewed
+        by, and are the responsibility of, the dashboard's creator – Mykolas Romeris University.</li>
+  </ul>
+  <p class="vv-pastaba">If you notice an error or inaccuracy, please let the dashboard's creator – Mykolas Romeris University – know (contact details at the bottom of the page).</p>
+</section>
+
+{% else %}
 <nav class="kelias-nav"><a href="index.html">← Švieslentė</a></nav>
 <section class="ivadas metodika-ivadas">
   <h1>Kaip vertinama: gerėja, stabilu ar prastėja</h1>
@@ -34,7 +79,7 @@
   <ul>
     <li><b>Kam naudotas DI:</b> programiniam kodui (duomenų atsisiuntimui, apdorojimui, grafikams ir svetainės
         generavimui) rašyti, duomenų rinkiniams parinkti, rodiklių aprašymų, vertinimo taisyklių ir paaiškinimų
-        šablonų tekstams parengti.</li>
+        šablonų tekstams parengti bei svetainei išversti į anglų kalbą.</li>
     <li><b>Kam DI nenaudojamas:</b> svetainės veikimo metu DI nenaudojamas. Rodiklių reikšmės, pokyčiai ir būsenos
         („gerėja“, „stabilu“, „prastėja“) kasdien apskaičiuojami automatiškai iš oficialių šaltinių duomenų pagal šiame
         puslapyje paskelbtas taisykles, o paaiškinimų sakiniai sudaromi iš apskaičiuotų skaičių pagal iš anksto
@@ -45,25 +90,26 @@
   <p class="vv-pastaba">Pastebėję klaidą ar netikslumą, praneškite švieslentės kūrėjui – Mykolo Romerio universitetui (kontaktai nurodyti puslapio apačioje).</p>
 </section>
 
+{% endif %}
 {% for s in sritys %}
 <section class="metodika-sritis">
   <h2>{{ s.nr }}. {{ s.pavadinimas }}</h2>
   <div class="lentele-wrap">
   <table class="metodika-lentele">
-    <thead><tr><th>Rodiklis</th><th>Dabartinė būsena</th><th>Palyginimo pagrindas</th><th>Taisyklė</th></tr></thead>
+    <thead><tr><th>{{ t("Rodiklis", "Indicator") }}</th><th>{{ t("Dabartinė būsena", "Current status") }}</th><th>{{ t("Palyginimo pagrindas", "Basis of comparison") }}</th><th>{{ t("Taisyklė", "Rule") }}</th></tr></thead>
     <tbody>
     {% for r in s.rodikliai %}
     <tr id="{{ r.id }}">
       <td><a href="rodikliai/{{ r.id }}.html">{{ r.pavadinimas }}</a></td>
       <td><span class="zyme zyme-{{ r.busena }}"><span aria-hidden="true">{{ busenos[r.busena].ikona }}</span> {{ busenos[r.busena].zodis }}</span></td>
-      <td>{{ r.palyginimas|capitalize if r.palyginimas else "–" }}</td>
+      <td>{{ r.palyginimas|pirma_didzioji if r.palyginimas else "–" }}</td>
       <td>{{ r.vertinimo_taisykle }}</td>
     </tr>
     {% for x in r.dalys %}
     <tr class="met-dalis">
       <td>↳ {{ x.pavadinimas }}</td>
       <td><span class="zyme zyme-{{ x.busena }}"><span aria-hidden="true">{{ busenos[x.busena].ikona }}</span> {{ busenos[x.busena].zodis }}</span></td>
-      <td>{{ x.palyginimas|capitalize if x.palyginimas else "–" }}</td>
+      <td>{{ x.palyginimas|pirma_didzioji if x.palyginimas else "–" }}</td>
       <td>{{ x.taisykle }}</td>
     </tr>
     {% endfor %}
