@@ -12,6 +12,7 @@
 <body>
 <header class="virsus">
   <div class="plotis">
+    <a class="virsus-mru" href="https://www.mruni.eu/{{ 'en/' if en }}"><img src="{{ kelias }}statika/mru-zenklas.png" alt="{{ t('Mykolo Romerio universitetas', 'Mykolas Romeris University') }}" height="30"></a>
     <a class="logo" href="{{ kelias }}index.html">{{ t("Vyriausybės veiklos stebėsena", "Government Performance Monitor") }}</a>
     <nav class="meniu" aria-label="{{ t('Pagrindinis meniu', 'Main menu') }}">
       <a class="meniu-nuoroda meniu-plati" href="{{ kelias }}index.html#suvestine">{{ t("Suvestinė", "Overview") }}</a>
@@ -40,7 +41,7 @@
 <footer class="apacia">
   <div class="plotis apacia-tinklelis">
     <div class="apacia-kurejas">
-      {% if mru_logo %}<a href="https://www.mruni.eu/{{ 'en/' if en }}" class="apacia-logo"><img src="{{ kelias }}{{ mru_logo }}" alt="{{ t('Mykolo Romerio universitetas', 'Mykolas Romeris University') }}" height="48"></a>{% endif %}
+      {% if mru_logo %}<a href="https://www.mruni.eu/{{ 'en/' if en }}" class="apacia-logo"><img src="{{ kelias }}{{ mru_logo }}" alt="{{ t('Mykolo Romerio universitetas', 'Mykolas Romeris University') }}" height="64"></a>{% endif %}
       <p class="apacia-pav">{{ t("Švieslentės kūrėjas –", "Created by") }} <b>{{ t("Mykolo Romerio universitetas", "Mykolas Romeris University") }}</b></p>
       <address class="apacia-kontaktai">
         {{ t("Ateities g. 20, LT-08303 Vilnius", "Ateities g. 20, LT-08303 Vilnius, Lithuania") }}<br>
