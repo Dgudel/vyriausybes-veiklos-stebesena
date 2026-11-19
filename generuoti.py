@@ -269,7 +269,8 @@ def generuok(kalba: str, isvestis: Path, bendra_info: dict):
             rasyk(f"rodikliai/{x.id}.html", "dalis.html", x=x, r=x.tevas, sritis=sritis)
     rasyk("index.html", "index.html", sritys=sritys, bendra=bendra, vertinti=vertinti,
           pagrindiniai=pagrindiniai, daliu_sk=daliu_sk, is_viso=len(visi),
-          pagr_sk=sum(len(s["pagrindines"]) for s in sritys), kitu_sk=sum(len(s["kitos"]) for s in sritys))
+          pagr_sk=sum(len(s["pagrindines"]) for s in sritys), kitu_sk=sum(len(s["kitos"]) for s in sritys),
+          sritiu_sk=len(sritys))
     rasyk("metodika.html", "metodika.html", sritys=sritys)
     for i, (sritis, r) in enumerate(visi):
         ankstesnis = visi[i - 1][1] if i > 0 else None
