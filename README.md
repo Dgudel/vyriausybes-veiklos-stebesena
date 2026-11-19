@@ -28,7 +28,8 @@ rodikliai/
   gyventojai.py                                                     # 6 sritis (Eurostat demo_gind)
   nusikalstamumas.py (IRD + Eurostat), gynybos_islaidos.py (NATO + Eurostat), savizudybes.py      # 5 sritis
   senejimas.py, grizimas.py, imigracija.py, migracijos_valdymas.py (Eurostat)                    # 6 sritis
-  korupcija.py (Eurostat sdg_16_50, sdg_16_40), valdymo_efektyvumas.py (Pasaulio banko WGI)       # 7 sritis
+  pasitikejimas.py (Standartinis Eurobarometras), korupcija.py (Eurostat sdg_16_50, sdg_16_40),
+  valdymo_efektyvumas.py (Pasaulio banko WGI)                                                    # 7 sritis
   ird.py      # IRD atvirų duomenų skaitytuvas (HTML lentelė)
 irankiai/pupp_rezultatai.py  # NŠA PUPP PDF → duomenys/pupp_salies_eilutes.csv (paleisti kartą per metus)
 irankiai/vbe_rezultatai.py   # NŠA VBE PDF + Excel → duomenys/vbe_salies_eilutes.csv, vbe_mokyklu_vidurkiai.csv
@@ -48,6 +49,10 @@ GitHub Actions svetainę perkuria **kasdien** (5:00 UTC) ir prieš tai atsisiun�
   `nama_10_lp_ulc`, `prc_hicp_manr`, `gov_10q_ggdebt`, `nasa_10_ki`, `ilc_lvho07a`, `sdg_16_20`, `sdg_16_40`,
   `sdg_16_50` ir kt.
 - **Lietuvos duomenų portalas**: S8R269 (pastatyti butai).
+- **Standartinis Eurobarometras** (`data.europa.eu` API → „Volume A“ Excel failai iš `webgate.ec.europa.eu`): kai
+  pasirodo nauja banga (du kartus per metus), iš jos pagal klausimo tekstą ištraukiamos Lietuvos ir ES-27 reikšmės
+  (pasitikėjimas Vyriausybe, Seimu, teismais, policija, partijomis; pasitenkinimas demokratija) ir pridedamos prie
+  `duomenys/eurobarometras_lt.csv` (2016–2026 m. bangos jau surinktos).
 - **Pasaulio bankas** (`api.worldbank.org`): WGI valdymo efektyvumas (GE.EST) ir teisės viršenybė (RL.EST) →
   `duomenys/wgi_lt.csv`. Jei failo nėra ir atsisiųsti nepavyksta, rodiklis praleidžiamas.
 - **ECB duomenų portalas** (`data-api.ecb.europa.eu`): SVKI metinis pokytis (Lietuva ir euro zona) – nuo 2026 m.,
@@ -90,6 +95,7 @@ ATNAUJINTI=1 python generuoti.py
 | Visuomenės senėjimas | koeficientas sumažėja > 0,5 | padidėja > 0,5 | tarp jų |
 | Emigracija ir grįžimas | LT piliečių grynoji migracija padidėja > 500 | sumažėja > 500 | tarp jų |
 | Būsto statyba | pastatytų butų 1000 gyv. padaugėja > 0,3 | sumažėja > 0,3 | tarp jų |
+| Pasitikėjimas Vyriausybe | pasitikinčiųjų dalis padidėja > 3 p. p., lyginant su tos pačios metų pusės banga prieš metus | sumažėja > 3 p. p. | tarp jų |
 | Korupcijos suvokimo indeksas | padidėja > 1 balu | sumažėja > 1 balu | tarp jų |
 | Valdymo efektyvumas (WGI) | įvertis padidėja > 0,1 | sumažėja > 0,1 | tarp jų |
 | Imigracija (6 sritis) | – informacinis rodiklis (◆ Stebimas), būsena nevertinama | – | – |

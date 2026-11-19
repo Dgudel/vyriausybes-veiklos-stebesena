@@ -14,7 +14,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from rodikliai import (busto_statyba, korupcija, valdymo_efektyvumas, pasitenkinimas, savizudybes, regionai, atsinaujinanti_energija, oro_tarsa, skurdas, nelygybe, imigracija, migracijos_valdymas, senejimas, grizimas, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
+from rodikliai import (busto_statyba, korupcija, valdymo_efektyvumas, pasitikejimas, pasitenkinimas, savizudybes, regionai, atsinaujinanti_energija, oro_tarsa, skurdas, nelygybe, imigracija, migracijos_valdymas, senejimas, grizimas, nusikalstamumas, gynybos_islaidos, atlieku_perdirbimas, gyventojai, sesd_emisijos, zuvusieji_keliuose, bvp, infliacija, nasumas, nedarbas, skola, brandos_egzaminai, busto_ispirkamumas, energijos_kainos, issilavinimas, realusis_du,
                        sveikatos_eiles, sveikatos_rezultatai, svietimo_pasiekimai)
 from rodikliai.bendra import (slugas, papildomas_grafikas, sk, sparkline_svg, zmoniu_laikotarpis, palyginimo_tekstas,
                               nustatyk_kalba, en, t)
@@ -77,7 +77,7 @@ SRITYS = [
      "pavadinimas": ("Valstybės valdymo kokybė ir gebėjimai", "Quality and capacity of governance"),
      "klausimas": ("Ar valstybės institucijos veikia skaidriai ir veiksmingai, o teisės viršenybė stiprėja?",
                    "Do state institutions work transparently and effectively, and is the rule of law getting stronger?"),
-     "rodikliai": [korupcija, valdymo_efektyvumas]},
+     "rodikliai": [pasitikejimas, korupcija, valdymo_efektyvumas]},
 ]
 
 BUSENOS_LT = {
