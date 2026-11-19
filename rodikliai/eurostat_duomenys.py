@@ -33,6 +33,10 @@ FILTRAI = {
     "migr_eiord": {"age": "TOTAL", "sex": "T", "unit": "PER", "geo": ["LT"]},
     "migr_eipre": {"citizen": "TOTAL", "sex": "T", "age": "TOTAL", "unit": "PER", "geo": ["LT"]},
     "migr_eirtn": {"age": "TOTAL", "sex": "T", "unit": "PER", "geo": ["LT"]},
+    "nasa_10_ki": {"na_item": "B7G_R_HAB_GR", "sector": "S14_S15"},
+    "ilc_lvho07a": {"age": "TOTAL", "sex": "T", "rskpovth": "TOTAL"},
+    "sdg_16_20": {"hhcomp": "TOTAL", "rskpovth": "TOTAL"},
+    "sdg_16_40": {"lev_perc": ["VG_FG", "VB_FB"]},
 }
 
 

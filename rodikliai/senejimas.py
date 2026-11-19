@@ -43,7 +43,9 @@ def rodiklis() -> Rodiklis:
     kryptis = t("padidėjo", "rose by") if pokytis > 0 else t("sumažėjo", "fell by")
 
     _dalys = [dalis(t("65 m. ir vyresnių dalis", "Share aged 65 and over"), seni, "mazesne", 0.3),
-              dalis(t("Vaikų (0–14 m.) dalis", "Share of children (0–14)"), vaikai, "didesne", 0.3)]
+              dalis(t("Vaikų (0–14 m.) dalis", "Share of children (0–14)"), vaikai, "didesne", 0.3),
+              dalis(t("Darbingo amžiaus (15–64 m.) gyventojų dalis", "Share of working-age population (15–64)"),
+                    (100 - vaikai - seni).dropna(), "didesne", 0.3)]
     return Rodiklis(
         dalys=_dalys,
         id="senejimas",

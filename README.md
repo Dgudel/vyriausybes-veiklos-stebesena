@@ -1,6 +1,6 @@
 # Vyriausybės veiklos stebėsenos švieslentė
 
-Statinė svetainė: pagrindinis puslapis su 6 sritimis ir rodiklių kortelėmis, kiekvienam rodikliui –
+Statinė svetainė: pagrindinis puslapis su 7 sritimis ir rodiklių kortelėmis, kiekvienam rodikliui –
 atskiras puslapis su grafikais, vertinimu (gerėja / stabilu / prastėja), apibrėžimu, šaltiniais ir CSV.
 Svetainę sugeneruoja Python, o GitHub Pages ją nemokamai paskelbia.
 
@@ -11,7 +11,7 @@ generuoti.py              # surenka rodiklius ir sugeneruoja svetainę į _site/
 rodikliai/
   bendra.py               # bendros priemonės: duomenų skaitymas, vertinimas, grafikų stilius
   saltiniai.py            # duomenų rinkiniai, naudojami kelių rodiklių
-  pasitenkinimas.py (1), savizudybes.py (2), regionai.py (3), atsinaujinanti_energija.py, oro_tarsa.py (4)
+  pasitenkinimas.py (1), savizudybes.py (5), regionai.py (3), atsinaujinanti_energija.py, oro_tarsa.py (4)
   skurdas.py, nelygybe.py   # 1 sritis (Eurostat EU-SILC: ilc_li02, ilc_li10, ilc_peps01n, ilc_mdsd11, ilc_di11, ilc_di12, tps00100, tps00098)
   realusis_du.py          # 1 rodiklis = 1 failas
   energijos_kainos.py
@@ -24,9 +24,11 @@ rodikliai/
   brandos_egzaminai.py    # VBE (NŠA)
   bvp.py, nedarbas.py, nasumas.py, infliacija.py, skola.py   # 3 sritis (Eurostat; infliacija – ir ECB)
   zuvusieji_keliuose.py, sesd_emisijos.py, atlieku_perdirbimas.py   # 4 sritis (Eurostat)
+  busto_statyba.py        # 4 sritis (VDA S8R269 + Eurostat demo_gind)
   gyventojai.py                                                     # 6 sritis (Eurostat demo_gind)
-  nusikalstamumas.py (IRD + Eurostat), migracijos_valdymas.py, gynybos_islaidos.py (NATO + Eurostat) # 5 sritis
-  senejimas.py, grizimas.py, imigracija.py (Eurostat)                                            # 6 sritis
+  nusikalstamumas.py (IRD + Eurostat), gynybos_islaidos.py (NATO + Eurostat), savizudybes.py      # 5 sritis
+  senejimas.py, grizimas.py, imigracija.py, migracijos_valdymas.py (Eurostat)                    # 6 sritis
+  korupcija.py (Eurostat sdg_16_50, sdg_16_40), valdymo_efektyvumas.py (Pasaulio banko WGI)       # 7 sritis
   ird.py      # IRD atvirų duomenų skaitytuvas (HTML lentelė)
 irankiai/pupp_rezultatai.py  # NŠA PUPP PDF → duomenys/pupp_salies_eilutes.csv (paleisti kartą per metus)
 irankiai/vbe_rezultatai.py   # NŠA VBE PDF + Excel → duomenys/vbe_salies_eilutes.csv, vbe_mokyklu_vidurkiai.csv
@@ -43,7 +45,11 @@ GitHub Actions svetainę perkuria **kasdien** (5:00 UTC) ir prieš tai atsisiun�
   `rodikliai/saltiniai.py`. Naujai lentelei pavadinimą rasite rinkinio puslapyje: Eksportuoti → API endpoint.
 - **Eurostat** (paketas `eurostat`): `hlth_silc_08`, `hlth_cd_apr`, `demo_mlexpec`, `hlth_silc_01`,
   `sdg_04_10`, `sdg_04_20`, `sdg_04_40`, `namq_10_gdp`, `nama_10_pc`, `une_rt_m`, `lfsi_emp_q`,
-  `nama_10_lp_ulc`, `prc_hicp_manr`, `gov_10q_ggdebt`.
+  `nama_10_lp_ulc`, `prc_hicp_manr`, `gov_10q_ggdebt`, `nasa_10_ki`, `ilc_lvho07a`, `sdg_16_20`, `sdg_16_40`,
+  `sdg_16_50` ir kt.
+- **Lietuvos duomenų portalas**: S8R269 (pastatyti butai).
+- **Pasaulio bankas** (`api.worldbank.org`): WGI valdymo efektyvumas (GE.EST) ir teisės viršenybė (RL.EST) →
+  `duomenys/wgi_lt.csv`. Jei failo nėra ir atsisiųsti nepavyksta, rodiklis praleidžiamas.
 - **ECB duomenų portalas** (`data-api.ecb.europa.eu`): SVKI metinis pokytis (Lietuva ir euro zona) – nuo 2026 m.,
   nes Eurostat lentelė `prc_hicp_manr` pasibaigė 2025 m. gruodžio duomenimis.
 - **NŠA PUPP rezultatai** skelbiami tik PDF, todėl atnaujinami rankiniu būdu kartą per metus (rugpjūtį–rugsėjį):
@@ -83,6 +89,9 @@ ATNAUJINTI=1 python generuoti.py
 | Neteisėtos migracijos valdymas | išsiųstų dalis padidėja > 2 p. p. | sumažėja > 2 p. p. | tarp jų |
 | Visuomenės senėjimas | koeficientas sumažėja > 0,5 | padidėja > 0,5 | tarp jų |
 | Emigracija ir grįžimas | LT piliečių grynoji migracija padidėja > 500 | sumažėja > 500 | tarp jų |
+| Būsto statyba | pastatytų butų 1000 gyv. padaugėja > 0,3 | sumažėja > 0,3 | tarp jų |
+| Korupcijos suvokimo indeksas | padidėja > 1 balu | sumažėja > 1 balu | tarp jų |
+| Valdymo efektyvumas (WGI) | įvertis padidėja > 0,1 | sumažėja > 0,1 | tarp jų |
 | Imigracija (6 sritis) | – informacinis rodiklis (◆ Stebimas), būsena nevertinama | – | – |
 | Anksti mokslus palikę jaunuoliai | dalis sumažėja > 0,5 p. p. | padidėja > 0,5 p. p. | tarp jų |
 

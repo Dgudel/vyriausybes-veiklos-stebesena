@@ -2,6 +2,7 @@
 import plotly.graph_objects as go
 
 from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius, zmoniu_laikotarpis, t, en
+from .eurostat_duomenys import serija
 from .saltiniai import SEKTORIAI, du_serija, kainu_pokytis, laikotarpis_is_datos
 
 SEKTORIAI_EN = {"Šalies ūkis": "Whole economy", "Privatusis sektorius": "Private sector",
@@ -61,6 +62,13 @@ def rodiklis() -> Rodiklis:
 
     _dalys = [dalis(t(f"{v}: realusis DU", f"{_sektorius(v)}: real wages"), du_serija("Realusis", v), "didesne", SLENKSTIS, budas="lygis",
                     zenklas=True, slenkscio_vnt=" %") for v in ["Privatusis sektorius", "Viešasis sektorius"]]
+    try:    # realiosios (pakoreguotos) bendrosios disponuojamosios namų ūkių pajamos vienam gyventojui, metinis pokytis
+        rdp = serija("nasa_10_ki", "LT", na_item="B7G_R_HAB_GR", sector="S14_S15", unit="PC")
+        _dalys.append(dalis(t("Realiosios disponuojamosios namų ūkių pajamos vienam gyventojui",
+                              "Real disposable household income per capita"), rdp, "didesne", SLENKSTIS,
+                            budas="lygis", zenklas=True, slenkscio_vnt=" %"))
+    except Exception as e:
+        print(f"  ⚠ nasa_10_ki neįtrauktas: {e}")
     return Rodiklis(
         dalys=_dalys,
         id="realusis-darbo-uzmokestis",
@@ -100,7 +108,8 @@ def rodiklis() -> Rodiklis:
               "The “Wages and prices” chart uses the price group “Total excluding tobacco”, as the source table has no "
               "overall CPI; the gap between the lines may therefore differ slightly from the change in real wages."),
         ],
-        saltiniai=[(t("Oficialiosios statistikos portalas – darbo užmokestis", "Official Statistics Portal – wages"),
+        saltiniai=[("Eurostat – nasa_10_ki (B7G_R_HAB_GR)", "https://ec.europa.eu/eurostat/databrowser/view/nasa_10_ki/default/table?lang=en"),
+                   (t("Oficialiosios statistikos portalas – darbo užmokestis", "Official Statistics Portal – wages"),
                     "https://osp.stat.gov.lt/"),
                    (t("Lietuvos atvirų duomenų portalas", "Lithuanian Open Data Portal"), "https://data.gov.lt/")],
         papildomai=[(f"{sk((kaupt - 1) * 100)} %",

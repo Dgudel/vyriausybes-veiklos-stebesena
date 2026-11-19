@@ -135,8 +135,8 @@ def rodiklis() -> Rodiklis:
     kryptis = t("sumažėjo", "fell by") if pokytis < 0 else t("padidėjo", "rose by")
 
     _dalys = []
-    for vardas, s in [(t("Sukčiavimas", "Fraud"), _metinis_pokytis(d, "reiksme_sukc")),
-                      (t("Visos veikos", "All offences"), _metinis_pokytis(visos.rename(columns={"reiksme": "v"}), "v"))]:
+    # Kortelėje – tik svarbiausios dalys (visos veikos, plėšimai, įsilaužimai ir vagystės lieka grafikuose ir lentelėje)
+    for vardas, s in [(t("Sukčiavimas", "Fraud"), _metinis_pokytis(d, "reiksme_sukc"))]:
         dx = dalis(vardas, s, "mazesne", SLENKSTIS, budas="lygis", zenklas=True, slenkscio_vnt=" %")
         dx.laikotarpis, dx.palyginimas = laikotarpis, palyginimo_tekstas(laikotarpis)
         _dalys.append(dx)
@@ -160,13 +160,19 @@ def rodiklis() -> Rodiklis:
         f4.update_yaxes(rangemode="tozero")
     except Exception as e:
         print(f"  ⚠ ištirtų dalis neapskaičiuota: {e}")
-    for kodas, vardas in KATEGORIJOS[:4]:
+    for kodas, vardas in KATEGORIJOS[:1]:          # tyčiniai nužudymai
         try:
             s = serija("crim_off_cat", "LT", iccs=kodas, unit="P_HTHAB")
             _dalys.append(dalis(t(f"{vardas} (100 tūkst. gyv.)", f"{_kat(vardas)} (per 100,000 inhabitants)"),
                                 s, "mazesne", 5.0, budas="proc", vienetai=""))
         except Exception:
             pass
+    try:    # subjektyvus saugumas: gyventojai, nurodantys nusikalstamumą, smurtą ar vandalizmą savo vietovėje
+        s = serija("sdg_16_20", "LT", hhcomp="TOTAL", rskpovth="TOTAL", unit="PC")
+        _dalys.append(dalis(t("Gyventojai, nurodantys nusikalstamumą, smurtą ar vandalizmą savo vietovėje",
+                              "People reporting crime, violence or vandalism in their area"), s, "mazesne", 1.0))
+    except Exception as e:
+        print(f"  ⚠ sdg_16_20 neįtrauktas: {e}")
     return Rodiklis(
         dalys=_dalys,
         id="nusikalstamumas",
@@ -213,7 +219,8 @@ def rodiklis() -> Rodiklis:
                     "A – number of serious and very serious crimes investigated, B – recorded in the reporting period, "
                     "C – recorded with the pre-trial investigation not completed. Each year's value is calculated for "
                     "the same period from the start of the year, so years are comparable.")],
-        saltiniai=[(t("IRD – visos užregistruotos nusikalstamos veikos", "IRD – all recorded criminal offences"),
+        saltiniai=[("Eurostat – sdg_16_20", "https://ec.europa.eu/eurostat/databrowser/view/sdg_16_20/default/table?lang=en"),
+                   (t("IRD – visos užregistruotos nusikalstamos veikos", "IRD – all recorded criminal offences"),
                     f"https://www.ird.lt/lt/indicators/opendata/item.{VISOS_ITEM}"),
                    (t("IRD – sukčiavimas (BK 182 str.)", "IRD – fraud (Criminal Code Art. 182)"),
                     f"https://www.ird.lt/lt/indicators/opendata/item.{SUKC_ITEM}"),

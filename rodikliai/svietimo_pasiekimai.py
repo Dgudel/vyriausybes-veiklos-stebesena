@@ -84,15 +84,12 @@ def rodiklis() -> Rodiklis:
     kryptis = t("sumažėjo", "fell by") if pokytis < 0 else t("padidėjo", "rose by")
     balo = t(" balo", " points")
 
+    # PISA trijų sričių (matematika, skaitymas, gamtos mokslai) žemų pasiekimų dalių vidurkis – viena dalis vietoj trijų
+    pisa_vid = pd.concat([pisa[k][0] for k in ("EF461", "READ", "SCI")], axis=1).dropna().mean(axis=1)
     _dalys = [dalis(t("Lietuvių k.: nepasiekė patenkinamo lygio", "Lithuanian: below the satisfactory level"),
                     lt["nepasieke_proc"], "mazesne", SLENKSTIS),
-              dalis(t("Matematikos PUPP vidurkis", "Mathematics PUPP mean score"), mat["vidurkis"], "didesne", 0.2,
-                    vienetai="", slenkscio_vnt=balo, dec=2),
-              dalis(t("Lietuvių k. PUPP vidurkis", "Lithuanian PUPP mean score"), lt["vidurkis"], "didesne", 0.2,
-                    vienetai="", slenkscio_vnt=balo, dec=2),
-              dalis(t("PISA: žemi pasiekimai – matematika", "PISA: low achievement – mathematics"), pisa["EF461"][0], "mazesne", SLENKSTIS),
-              dalis(t("PISA: žemi pasiekimai – skaitymas", "PISA: low achievement – reading"), pisa["READ"][0], "mazesne", SLENKSTIS),
-              dalis(t("PISA: žemi pasiekimai – gamtos mokslai", "PISA: low achievement – science"), pisa["SCI"][0], "mazesne", SLENKSTIS)]
+              dalis(t("PISA: žemų pasiekimų 15-mečiai (3 sričių vidurkis)",
+                      "PISA: low-achieving 15-year-olds (average of 3 domains)"), pisa_vid, "mazesne", SLENKSTIS)]
     return Rodiklis(
         dalys=_dalys,
         id="svietimo-pasiekimai",

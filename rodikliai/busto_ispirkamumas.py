@@ -2,6 +2,7 @@
 import plotly.graph_objects as go
 
 from .bendra import dalis, SERIJOS, Rodiklis, ivertink, linijos, sk, stilius, zmoniu_laikotarpis, t, en, vnt_pp
+from .eurostat_duomenys import serija
 from .saltiniai import (busto_kainu_indeksai, busto_kainu_pokytis, du_serija, ketvirtinis,
                         ketvirtis_is_datos)
 
@@ -77,6 +78,12 @@ def rodiklis() -> Rodiklis:
                             sk_, "mazesne", SLENKSTIS, budas="lygis", zenklas=True, vienetai=vnt_pp()))
         _dalys[-1].pokytis = t(f"kainos {sk(kt[sk_.index[-1]])} %, atlyginimai {sk(neto_q[sk_.index[-1]])} %",
                                f"prices {sk(kt[sk_.index[-1]])}%, wages {sk(neto_q[sk_.index[-1]])}%")
+    try:    # būsto išlaidų našta: gyventojai, kurių būsto išlaidos viršija 40 % disponuojamųjų pajamų
+        nasta = serija("ilc_lvho07a", "LT", age="TOTAL", sex="T", rskpovth="TOTAL", unit="PC")
+        _dalys.append(dalis(t("Būsto išlaidų našta (išlaidos > 40 % pajamų)", "Housing cost overburden (costs > 40% of income)"),
+                            nasta, "mazesne", 0.5))
+    except Exception as e:
+        print(f"  ⚠ ilc_lvho07a neįtrauktas: {e}")
     return Rodiklis(
         dalys=_dalys,
         id="busto-ispirkamumas",
@@ -122,7 +129,8 @@ def rodiklis() -> Rodiklis:
               "A related indicator – housing cost overburden (Eurostat ilc_lvho07a) – reflects the burden of living "
               "costs rather than the affordability of buying."),
         ],
-        saltiniai=[(t("Lietuvos atvirų duomenų portalas – būsto kainų indeksai",
+        saltiniai=[("Eurostat – ilc_lvho07a", "https://ec.europa.eu/eurostat/databrowser/view/ilc_lvho07a/default/table?lang=en"),
+                   (t("Lietuvos atvirų duomenų portalas – būsto kainų indeksai",
                       "Lithuanian Open Data Portal – house price indices"), "https://data.gov.lt/"),
                    (t("Oficialiosios statistikos portalas", "Official Statistics Portal"), "https://osp.stat.gov.lt/"),
                    ("Eurostat – ilc_lvho07a",
